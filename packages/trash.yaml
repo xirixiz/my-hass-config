@@ -1,0 +1,144 @@
+################################################
+## Packages / Trash
+################################################
+homeassistant:
+  customize:
+    sensor.trash_today:
+      friendly_name: Vandaag
+    sensor.trash_tomorrow:
+      friendly_name: Morgen
+    sensor.trash_first_next_item:
+      friendly_name: Next pickup item
+    sensor.trash_first_next_in_days:
+      friendly_name: Next pickup in days
+    input_boolean.trash_reminder:
+      icon: mdi:reminder
+      
+    sensor.trash_gft:
+      friendly_name: GFT
+      entity_picture: /local/mijnafvalwijzer/gft3.png
+    sensor.trash_papier:
+      friendly_name: Papier
+      entity_picture: /local/mijnafvalwijzer/papier3.png
+    sensor.trash_pmd:
+      friendly_name: Plastic
+      entity_picture: /local/mijnafvalwijzer/plastic3.png
+    sensor.trash_restafval:
+      friendly_name: Restafval
+      entity_picture: /local/mijnafvalwijzer/rest3.png
+
+################################################
+## Inputs
+################################################
+input_boolean:
+  trash_moved:
+    name: Trash has been moved
+    initial: 'off'
+    icon: mdi:delete-empty
+  trash_reminder:
+    name: Trash reminder enabled
+    initial: 'on'
+
+################################################
+## Sensor
+################################################
+sensor:
+  - platform: afvalwijzer
+    provider: mijnafvalwijzer
+    zipcode: !secret afvalwijzer_postcode
+    housenumber: !secret afvalwijzer_huisnummer
+
+  - platform: template
+    sensors:
+      trash_first_next_item_formatted:
+        value_template: >-
+          {% if is_state('sensor.trash_first_next_item', 'gft') %}GFT
+          {% elif is_state('sensor.trash_first_next_item', 'papier') %}Papier
+          {% elif is_state('sensor.trash_first_next_item', 'pmd') %}Plastic
+          {% elif is_state('sensor.trash_first_next_item', 'restafval') %}Restafval
+          {% endif %}
+        friendly_name: 'Next pickup item'
+
+  - platform: template
+    sensors:
+      trash_today_formatted:
+        value_template: >-
+          {% if is_state('sensor.trash_today', 'gft') %}GFT
+          {% elif is_state('sensor.trash_today', 'papier') %}Papier
+          {% elif is_state('sensor.trash_today', 'pmd') %}Plastic
+          {% elif is_state('sensor.trash_today', 'restafval') %}Restafval
+          {% else %}Geen
+          {% endif %}
+        friendly_name: 'Vandaag'
+
+  - platform: template
+    sensors:
+      trash_tomorrow_formatted:
+        value_template: >-
+          {% if is_state('sensor.trash_tomorrow', 'gft') %}GFT
+          {% elif is_state('sensor.trash_tomorrow', 'papier') %}Papier
+          {% elif is_state('sensor.trash_tomorrow', 'pmd') %}Plastic
+          {% elif is_state('sensor.trash_tomorrow', 'restafval') %}Restafval
+          {% else %}Geen
+          {% endif %}
+        friendly_name: 'Morgen'
+
+################################################
+## Automation
+################################################
+automation:
+  - alias: Afval - Herstel notificatie
+    trigger:
+      platform: state
+      entity_id: input_boolean.trash_moved
+      to: 'on'
+      for:
+        hours: 12
+    action:
+      - service: input_boolean.turn_off
+        entity_id: input_boolean.trash_moved
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.trash_reminder
+
+  - alias: Afval - Bevestig notificatie
+    trigger:
+      platform: event
+      event_type: ios.notification_action_fired
+      event_data:
+        actionName: MARK_TRASH_MOVED
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.trash_moved
+
+  - alias: Afval - Verzend notificatie
+    trigger:
+      platform: time_pattern
+      minutes: '/60'
+      seconds: 00
+    condition:
+      condition: and
+      conditions:
+        - condition: state
+          entity_id: input_boolean.trash_moved
+          state: 'off'
+        - condition: state
+          entity_id: input_boolean.trash_reminder
+          state: 'on'
+        - condition: time
+          after: '18:00:00'
+          before: '23:00:00'
+        - condition: template
+          value_template: "{{ states('sensor.trash_tomorrow') != 'Geen' }}"
+    action:
+      - service: notify.family
+        data:
+          title: "Afval"
+          message: 'Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. Afvaltype(n): {{ states.sensor.trash_tomorrow.state }} wordt opgehaald op: {{ (as_timestamp(now()) + (24*3600)) | timestamp_custom("%d-%m-%Y", True) }}!'
+          data:
+            push:
+              badge: 0
+              category: 'afval'
+      # - service: tts.google_say
+      #   entity_id: media_player.woonkamer
+      #   data_template:
+      #     message: 'Vergeet het afval niet buiten te zetten. Afval type is {{ states.sensor.trash_tomorrow.state }}!'

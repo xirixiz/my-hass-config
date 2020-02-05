@@ -1,0 +1,3 @@
+  [submodule "custom_components/afvalwijzer"]
+	path = custom_components/afvalwijzer
+	url = https://github.com/xirixiz/Home-Assistant-Sensor-Afvalwijzer.git

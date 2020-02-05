@@ -1,0 +1,9 @@
+vakantie:
+  name: Vakantie status
+  initial: off
+  icon: mdi:beach
+
+oppas:
+  name: Oppas status
+  initial: off
+  icon: mdi:account-child

@@ -16,16 +16,16 @@ homeassistant:
       
     sensor.trash_gft:
       friendly_name: GFT
-      entity_picture: /local/mijnafvalwijzer/gft3.png
+      entity_picture: /local/afvalwijzer/GFT.png
     sensor.trash_papier:
       friendly_name: Papier
-      entity_picture: /local/mijnafvalwijzer/papier3.png
+      entity_picture: /local/afvalwijzer/Papier.png
     sensor.trash_pmd:
-      friendly_name: Plastic
-      entity_picture: /local/mijnafvalwijzer/plastic3.png
+      friendly_name: PMD
+      entity_picture: /local/afvalwijzer/PMD.png
     sensor.trash_restafval:
       friendly_name: Restafval
-      entity_picture: /local/mijnafvalwijzer/rest3.png
+      entity_picture: /local/afvalwijzer/Restafval.png
 
 ################################################
 ## Inputs
@@ -54,7 +54,7 @@ sensor:
         value_template: >-
           {% if is_state('sensor.trash_first_next_item', 'gft') %}GFT
           {% elif is_state('sensor.trash_first_next_item', 'papier') %}Papier
-          {% elif is_state('sensor.trash_first_next_item', 'pmd') %}Plastic
+          {% elif is_state('sensor.trash_first_next_item', 'pmd') %}PMD
           {% elif is_state('sensor.trash_first_next_item', 'restafval') %}Restafval
           {% endif %}
         friendly_name: 'Next pickup item'
@@ -65,7 +65,7 @@ sensor:
         value_template: >-
           {% if is_state('sensor.trash_today', 'gft') %}GFT
           {% elif is_state('sensor.trash_today', 'papier') %}Papier
-          {% elif is_state('sensor.trash_today', 'pmd') %}Plastic
+          {% elif is_state('sensor.trash_today', 'pmd') %}PMD
           {% elif is_state('sensor.trash_today', 'restafval') %}Restafval
           {% else %}Geen
           {% endif %}
@@ -77,7 +77,7 @@ sensor:
         value_template: >-
           {% if is_state('sensor.trash_tomorrow', 'gft') %}GFT
           {% elif is_state('sensor.trash_tomorrow', 'papier') %}Papier
-          {% elif is_state('sensor.trash_tomorrow', 'pmd') %}Plastic
+          {% elif is_state('sensor.trash_tomorrow', 'pmd') %}PMD
           {% elif is_state('sensor.trash_tomorrow', 'restafval') %}Restafval
           {% else %}Geen
           {% endif %}
@@ -128,12 +128,12 @@ automation:
           after: '18:00:00'
           before: '23:00:00'
         - condition: template
-          value_template: "{{ states('sensor.trash_tomorrow') != 'Geen' }}"
+          value_template: "{{ states('sensor.trash_tomorrow_formatted') != 'Geen' }}"
     action:
       - service: notify.family
         data:
           title: "Afval"
-          message: 'Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. Afvaltype(n): {{ states.sensor.trash_tomorrow.state }} wordt opgehaald op: {{ (as_timestamp(now()) + (24*3600)) | timestamp_custom("%d-%m-%Y", True) }}!'
+          message: 'Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. Afvaltype(n): {{ states.sensor.trash_tomorrow_formatted.state }} wordt opgehaald op: {{ (as_timestamp(now()) + (24*3600)) | timestamp_custom("%d-%m-%Y", True) }}!'
           data:
             push:
               badge: 0
@@ -141,4 +141,4 @@ automation:
       # - service: tts.google_say
       #   entity_id: media_player.woonkamer
       #   data_template:
-      #     message: 'Vergeet het afval niet buiten te zetten. Afval type is {{ states.sensor.trash_tomorrow.state }}!'
+      #     message: 'Vergeet het afval niet buiten te zetten. Afval type is {{ states.sensor.trash_tomorrow_formatted.state }}!'

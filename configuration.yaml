@@ -33,6 +33,12 @@ logbook:
       - sensor.last_boot
       - sensor.date
 
+logger:
+  default: info
+  logs:
+    custom_components.sensor.afvalwijzer: debug
+    custom_components.afvalwijzer: debug
+
 group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
@@ -92,65 +98,6 @@ hue:
       allow_unreachable: true
       allow_hue_groups: true
 
-light:
-  - platform: group
-    name: Keuken - Verlichting
-    entities:
-      - light.keuken_armatuur
-      - light.keuken_hanglamp
-      - light.keuken_spot_nis_links
-      - light.keuken_spot_nis_rechts
-      - light.keuken_spot_tuin_links_1
-      - light.keuken_spot_tuin_links_2
-      - light.keuken_spot_tuin_rechts_1
-      - light.keuken_spot_tuin_rechts_2
-      - light.keuken_spot_werkblad_links
-      - light.keuken_spot_werkblad_rechts
-
-  - platform: group
-    name: Buiten - Verlichting
-    entities:
-      - light.buiten_achter_links
-      - light.buiten_achter_rechts
-      - light.buiten_garage
-      - light.buiten_tuin_verlichting
-      - light.buiten_voordeur
-
-  - platform: group
-    name: Hal & Overlopen - Verlichting
-    entities:
-      - light.hal_verdieping_1
-      - light.hal_verdieping_2
-
-  - platform: group
-    name: Buiten - Verlichting
-    entities:
-      - light.woonkamer_armatuur
-      - light.woonkamer_tv_verlichting
-      - light.woonkamer_kastlamp_links
-      - light.woonkamer_kastlamp_rechts
-      - light.woonkamer_rails_links
-      - light.woonkamer_rails_rechts
-      - light.woonkamer_spot_tuin_links_1
-      - light.woonkamer_spot_tuin_links_2
-      - light.woonkamer_spot_tuin_midden_1
-      - light.woonkamer_spot_tuin_midden_2
-      - light.woonkamer_spot_tuin_rechts_1
-      - light.woonkamer_spot_tuin_rechts_2
-      - light.studeerkamer_links
-      - light.studeerkamer_rechts
-
-  - platform: group
-    name: Kerstboom - Verlichting
-    entities:
-      - light.kerstboom
-
-  - platform: group
-    name: Slaapkamer Lex en Boris - Verlichting
-    entities:
-      - light.slaapkamer_boris_2
-      - light.slaapkamer_lex_2
-
 nest:
   client_id: !secret nest_client_id
   client_secret: !secret nest_client_secret
@@ -171,12 +118,6 @@ cast:
   - host: !secret nvidia_shield
   - host: !secret lgwebostv_host_1
   - host: !secret lgwebostv_host_2
-
-# pi_hole:
-#   host: !secret pi_hole_host
-#   api_key: !secret pi_hole_api_key
-#   ssl: false
-#   verify_ssl: false
 
 device_tracker:
 #  - platform: google_maps

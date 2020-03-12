@@ -2,7 +2,8 @@
   alias: Woonkamer - Verlichting - Lux - Aan
   description: ''
   trigger:
-  - below: 10
+  - above: 3
+    below: 10
     device_id: 3301c784485e43ca92a8576aae1d14c6
     domain: sensor
     entity_id: sensor.woonkamer_light_level
@@ -29,10 +30,6 @@
   - data:
       group_name: Keuken
       scene_name: KeukenDimmed
-    service: hue.hue_activate_scene
-  - data:
-      group_name: Buiten
-      scene_name: Bright
     service: hue.hue_activate_scene
 - id: '1577787317842'
   alias: Woonkamer - Verlichting - Lux - Uit
@@ -62,8 +59,6 @@
     entity_id: light.woonkamer
     service: light.turn_off
   - entity_id: light.keuken
-    service: light.turn_off
-  - entity_id: light.buiten
     service: light.turn_off
 - id: '1577796092710'
   alias: Hal - Verlichting - Motion - Dag
@@ -102,7 +97,7 @@
     type: motion
   condition:
   - after: '20:00'
-    before: 08:00
+    before: '23:59'
     condition: time
   action:
   - data:
@@ -220,4 +215,68 @@
   condition: []
   action:
   - entity_id: light.hal_overlopen
+    service: light.turn_off
+- id: '1581204986110'
+  alias: Buiten - Verlichting - Aan
+  description: ''
+  trigger:
+  - above: 0
+    below: 10
+    device_id: 3301c784485e43ca92a8576aae1d14c6
+    domain: sensor
+    entity_id: sensor.woonkamer_light_level
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+    platform: device
+    type: illuminance
+  condition:
+  - condition: and
+    conditions:
+    - condition: state
+      entity_id: light.buiten
+      state: 'off'
+    - after: '16:00'
+      before: 00:00
+      condition: time
+  action:
+  - data:
+      group_name: Buiten
+      scene_name: Bright
+    service: hue.hue_activate_scene
+- id: '1581205043194'
+  alias: Buiten - Verlichting - Uit
+  description: ''
+  trigger:
+  - at: 00:00
+    platform: time
+  condition:
+  - condition: state
+    entity_id: light.buiten
+    state: 'on'
+  action:
+  - entity_id: light.buiten
+    service: light.turn_off
+- id: '1583331224891'
+  alias: Buiten - Verlichting - Motion
+  description: ''
+  trigger:
+  - entity_id: binary_sensor.front_door_camera_motion_detected
+    for: 00:00:10
+    from: 'Off'
+    platform: state
+    to: 'On'
+  condition:
+  - after: 00:00
+    before: 06:00
+    condition: time
+  action:
+  - data:
+      group_name: Buiten
+      scene_name: Bright
+    service: hue.hue_activate_scene
+  - delay: 00:05:00
+  - data: {}
+    entity_id: light.buiten
     service: light.turn_off

@@ -83,6 +83,18 @@ sensor:
           {% endif %}
         friendly_name: 'Morgen'
 
+  - platform: template
+    sensors:
+      trash_day_after_tomorrow_formatted:
+        value_template: >-
+          {% if is_state('sensor.trash_day_after_tomorrow', 'gft') %}GFT
+          {% elif is_state('sensor.trash_day_after_tomorrow', 'papier') %}Papier
+          {% elif is_state('sensor.trash_day_after_tomorrow', 'pmd') %}PMD
+          {% elif is_state('sensor.trash_day_after_tomorrow', 'restafval') %}Restafval
+          {% else %}Geen
+          {% endif %}
+        friendly_name: 'Overmorgen'
+
 ################################################
 ## Automation
 ################################################

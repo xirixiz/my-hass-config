@@ -1,14 +1,12 @@
 homeassistant:
   packages: !include_dir_named packages
 
-# Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 # http:
 #   base_url: example.duckdns.org:8123
 
-# Text to speech
 tts:
   - platform: google_translate
     language: 'nl'
@@ -35,9 +33,28 @@ logbook:
 
 logger:
   default: info
-  logs:
-    custom_components.sensor.afvalwijzer: debug
-    custom_components.afvalwijzer: debug
+  #logs:
+    #custom_components.afvalwijzer: debug
+    #homeassistant.components.scrape: debug
+
+#influxdb:
+#  host: 192.168.1.15
+#  max_retries: 3
+#  default_measurement: state
+#  include:
+#    entities:
+#      - light.woonkamer
+#      - light.hal_overlopen
+#      - sensor.hal_light_level
+#      - sensor.woonkamer_light_level
+#      - media_player.livingroom_tv
+#      - media_player.bedroom_tv
+#      - sensor.wasmachine_watts
+#      - sensor.droger_watts
+#      - sensor.living_room_thermostat_humidity
+#      - sensor.living_room_thermostat_temperature
+#      - sensor.living_room_thermostat_target
+#      - weather.home
 
 group: !include groups.yaml
 automation: !include automations.yaml
@@ -119,11 +136,11 @@ cast:
   - host: !secret lgwebostv_host_1
   - host: !secret lgwebostv_host_2
 
-device_tracker:
-#  - platform: google_maps
-#    username: !secret lieke_gmail 
-#    max_gps_accuracy: 200
-  - platform: nmap_tracker
-    home_interval: 120
-    hosts:
-      - !secret nmap_hosts
+#device_tracker:
+  # - platform: google_maps
+  #   username: !secret lieke_gmail
+  #   max_gps_accuracy: 200
+  # - platform: nmap_tracker
+  #   home_interval: 120
+  #   hosts:
+  #     - !secret nmap_hosts

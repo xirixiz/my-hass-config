@@ -3,7 +3,7 @@
   description: ''
   trigger:
   - above: 3
-    below: 10
+    below: 12
     device_id: 3301c784485e43ca92a8576aae1d14c6
     domain: sensor
     entity_id: sensor.woonkamer_light_level
@@ -257,26 +257,4 @@
     state: 'on'
   action:
   - entity_id: light.buiten
-    service: light.turn_off
-- id: '1583331224891'
-  alias: Buiten - Verlichting - Motion
-  description: ''
-  trigger:
-  - entity_id: binary_sensor.front_door_camera_motion_detected
-    for: 00:00:10
-    from: 'Off'
-    platform: state
-    to: 'On'
-  condition:
-  - after: 00:00
-    before: 06:00
-    condition: time
-  action:
-  - data:
-      group_name: Buiten
-      scene_name: Bright
-    service: hue.hue_activate_scene
-  - delay: 00:05:00
-  - data: {}
-    entity_id: light.buiten
     service: light.turn_off

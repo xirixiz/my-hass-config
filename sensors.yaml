@@ -44,23 +44,9 @@
       value_template: '{{ states.sensor.hal_light_level.attributes.lightlevel }}'
       unit_of_measurement: lux
 
-- platform: syncthru
-  resource: !secret printer
-  name: Samsung Printer
-
-- platform: synologydsm
-  host: !secret nas_host_ip
-  port: 5000
-  ssl: 'false'
-  username: !secret nas_username
-  password: !secret nas_password
-  monitored_conditions:
-    - cpu_total_load
-    - memory_real_usage
-    - disk_smart_status
-    - disk_temp
-    - volume_percentage_used
-    - volume_size_total
+#- platform: syncthru
+#  resource: !secret printer
+#  name: Samsung Printer
 
 - platform: dnsip
   name: IP adres

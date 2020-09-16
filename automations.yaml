@@ -24,6 +24,10 @@
       state: 'off'
   action:
   - data:
+      group_name: Beneden
+      scene_name: BenedenDimmed
+    service: hue.hue_activate_scene
+  - data:
       group_name: Woonkamer
       scene_name: WoonkamerDimmed
     service: hue.hue_activate_scene
@@ -56,9 +60,12 @@
       state: 'on'
   action:
   - data: {}
-    entity_id: light.woonkamer
+    entity_id: light.beneden
     service: light.turn_off
   - entity_id: light.keuken
+    service: light.turn_off
+  - data: {}
+    entity_id: light.woonkamer
     service: light.turn_off
 - id: '1577796092710'
   alias: Hal - Verlichting - Motion - Dag
@@ -170,19 +177,22 @@
 - id: '1577872674982'
   alias: Vakantie - Apparatuur uitschakelen
   trigger:
-  - platform: state
-    entity_id: input_boolean.vakantie
+  - entity_id: input_boolean.vakantie
     from: 'off'
+    platform: state
     to: 'on'
   action:
-  - service: light.turn_off
-    entity_id: light.woonkamer_tv
-  - service: light.turn_off
-    entity_id: light.slaapkamer_tv
+  - entity_id: light.woonkamer_tv
+    service: light.turn_off
+  - entity_id: light.slaapkamer_tv
+    service: light.turn_off
   - entity_id: switch.wasmachine
     service: switch.turn_off
   - entity_id: switch.droger
     service: switch.turn_off
+  - data: {}
+    entity_id: light.woonkamer_tv
+    service: light.turn_off
 - id: '1577872674983'
   alias: Vakantie - Apparatuur inschakelen
   trigger:
@@ -192,8 +202,6 @@
     to: 'off'
   action:
   - entity_id: light.woonkamer_tv
-    service: light.turn_on
-  - entity_id: light.slaapkamer_tv
     service: light.turn_on
   - entity_id: switch.wasmachine
     service: switch.turn_on
@@ -258,3 +266,59 @@
   action:
   - entity_id: light.buiten
     service: light.turn_off
+- id: '1590339256250'
+  alias: Buiten - Verlichting - Motion
+  description: ''
+  trigger:
+  - device_id: 3564efe7aedf4465a41cf9f88d14c156
+    domain: binary_sensor
+    entity_id: binary_sensor.buiten_sensor_motion
+    platform: device
+    type: motion
+  condition:
+  - after: 01:00
+    before: 06:00
+    condition: time
+  action:
+  - data:
+      message: Er is beweging bij de voordeur gedecteerd!
+      title: Beweging!
+    service: notify.family
+  - brightness_pct: 100
+    device_id: 4610da9448cc49f497dd9eaa8f0f2e45
+    domain: light
+    entity_id: light.buiten_voordeur
+    type: turn_on
+  - brightness_pct: 100
+    device_id: 909c13edc42142178ee0988238b9734d
+    domain: light
+    entity_id: light.buiten_garage
+    type: turn_on
+  - delay: 00:7:30
+  - device_id: 4610da9448cc49f497dd9eaa8f0f2e45
+    domain: light
+    entity_id: light.buiten_voordeur
+    type: turn_off
+  - device_id: 909c13edc42142178ee0988238b9734d
+    domain: light
+    entity_id: light.buiten_garage
+    type: turn_off
+- id: '1597609986589'
+  alias: Wakker
+  description: ''
+  trigger:
+  - device_id: 3301c784485e43ca92a8576aae1d14c6
+    domain: binary_sensor
+    entity_id: binary_sensor.woonkamer_motion
+    platform: device
+    type: motion
+  condition:
+  - after: 05:00
+    before: 07:30
+    condition: time
+  action:
+  - data:
+      message: Lex is beneden!
+      title: Lex wakker
+    service: notify.family
+  mode: single

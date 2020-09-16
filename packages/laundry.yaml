@@ -158,12 +158,12 @@ automation:
     trigger:
     - platform: numeric_state
       entity_id: sensor.wasmachine_watts
-      above: 5
+      above: 2
       for:
         minutes: 5
     - platform: numeric_state
       entity_id: sensor.droger_watts
-      above: 5
+      above: 2
       for:
         minutes: 5
     condition:

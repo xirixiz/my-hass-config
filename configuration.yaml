@@ -3,6 +3,20 @@ homeassistant:
 
 default_config:
 
+recorder:
+  purge_keep_days: 7
+  exclude:
+    entities:
+     - sensor.last_boot
+     - sensor.date
+
+logbook:
+  exclude:
+    entities:
+      - sensor.last_boot
+      - sensor.date
+
+
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 # http:
 #   base_url: example.duckdns.org:8123
@@ -17,19 +31,6 @@ updater:
   include_used_components: true
 
 proximity:
-
-recorder:
-  purge_keep_days: 7
-  exclude:
-    entities:
-     - sensor.last_boot
-     - sensor.date
-
-logbook:
-  exclude:
-    entities:
-      - sensor.last_boot
-      - sensor.date
 
 logger:
   default: info
@@ -68,6 +69,8 @@ binary_sensor: !include binary_sensors.yaml
 input_number: !include input_numbers.yaml
 input_boolean: !include input_booleans.yaml
 
+#mobile_app:
+
 ios:
   push:
     categories:
@@ -100,22 +103,22 @@ notify:
   - platform: group
     name: family
     services:
-      - service: mobile_app_brams_iphone
+      - service: mobile_app_skynet_mobile
       - service: mobile_app_lieke_iphone
   - platform: group
     name: bram
     services:
-      - service: mobile_app_brams_iphone
+      - service: mobile_app_skynet_mobile
 
 timer:
   hal_overlopen:
     duration: '00:5:00'
 
-hue:
-  bridges:
-    - host: !secret philips_hue_host
-      allow_unreachable: true
-      allow_hue_groups: true
+#hue:
+#  bridges:
+#    - host: !secret philips_hue_host
+#      allow_unreachable: true
+#      allow_hue_groups: true
 
 nest:
   client_id: !secret nest_client_id
@@ -132,11 +135,11 @@ webostv:
   - host: !secret lgwebostv_host_2
     name: Bedroom TV
 
-cast:
-  media_player:
-  - host: !secret nvidia_shield
-  - host: !secret lgwebostv_host_1
-  - host: !secret lgwebostv_host_2
+#cast:
+#  media_player:
+#  - host: !secret nvidia_shield
+#  - host: !secret lgwebostv_host_1
+#  - host: !secret lgwebostv_host_2
 
 #device_tracker:
   # - platform: google_maps

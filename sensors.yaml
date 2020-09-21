@@ -16,25 +16,6 @@
 
 - platform: template
   sensors:
-    time_of_day:
-      friendly_name: 'Time of Day'
-      entity_id: sensor.time_date
-      value_template: >-
-        {% if   now().strftime("%H:%M") < "08:00" %} night
-        {% elif now().strftime("%H:%M") < "18:00" %} daytime
-        {% elif now().strftime("%H:%M") < "24:00" %} evening
-        {% endif %}
-    day_of_year:
-      friendly_name: 'Day Number'
-      entity_id: sensor.time_date
-      value_template: '{{ now().strftime("%j") }}'
-    week_of_year:
-      friendly_name: 'Week Number'
-      entity_id: sensor.time_date
-      value_template: '{{ now().strftime("%U") }}'
-
-- platform: template
-  sensors:
     woonkamer_light_level_lux:
       friendly_name: 'Woonkamer Light Level - LUX'
       value_template: '{{ states.sensor.woonkamer_light_level.attributes.lightlevel }}'

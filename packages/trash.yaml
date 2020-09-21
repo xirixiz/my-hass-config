@@ -13,7 +13,7 @@ homeassistant:
       friendly_name: Next pickup in days
     input_boolean.trash_reminder:
       icon: mdi:reminder
-      
+
     sensor.trash_gft:
       friendly_name: GFT
       entity_picture: /local/afvalwijzer/GFT.png
@@ -46,10 +46,26 @@ input_boolean:
 
 sensor:
   - platform: afvalwijzer
+    # data_collector: scraper
     provider: mijnafvalwijzer
-    api_token: 5ef443e778f41c4f75c69459eea6e6ae0c2d92de729aa0fc61653815fbd6a8ca
+    # api_token: 5ef443e778f41c4f75c69459eea6e6ae0c2d92de729aa0fc61653815fbd6a8ca
     zipcode: !secret afvalwijzer_postcode
     housenumber: !secret afvalwijzer_huisnummer
+    # default_label: 'Geen'
+
+  # - platform: afvaldienst
+  #   resources:
+  #     - gft
+  #     - papier
+  #     - restafval
+  #     - pmd
+  #     - kerstboom
+  #     - today
+  #     - tomorrow
+  #     - day_after_tomorrow
+  #   provider: mijnafvalwijzer
+  #   postal_code: !secret afvalwijzer_postcode
+  #   street_number: !secret afvalwijzer_huisnummer
 
   - platform: template
     sensors:
@@ -62,8 +78,6 @@ sensor:
           {% endif %}
         friendly_name: 'Next pickup item'
 
-  - platform: template
-    sensors:
       trash_today_formatted:
         value_template: >-
           {% if is_state('sensor.trash_today', 'gft') %}GFT
@@ -74,8 +88,6 @@ sensor:
           {% endif %}
         friendly_name: 'Vandaag'
 
-  - platform: template
-    sensors:
       trash_tomorrow_formatted:
         value_template: >-
           {% if is_state('sensor.trash_tomorrow', 'gft') %}GFT
@@ -86,8 +98,6 @@ sensor:
           {% endif %}
         friendly_name: 'Morgen'
 
-  - platform: template
-    sensors:
       trash_day_after_tomorrow_formatted:
         value_template: >-
           {% if is_state('sensor.trash_day_after_tomorrow', 'gft') %}GFT
@@ -128,8 +138,7 @@ automation:
   - alias: Afval - Verzend notificatie
     trigger:
       platform: time_pattern
-      minutes: '/60'
-      seconds: 00
+      hours: "/1"
     condition:
       condition: and
       conditions:

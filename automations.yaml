@@ -74,10 +74,6 @@
   - device_id: 90706093c60c4af29471cd60bbdd2b41
     domain: binary_sensor
     entity_id: binary_sensor.hal_motion
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 0
     platform: device
     type: motion
   condition:
@@ -96,10 +92,6 @@
   - device_id: 90706093c60c4af29471cd60bbdd2b41
     domain: binary_sensor
     entity_id: binary_sensor.hal_motion
-    for:
-      hours: 0
-      minutes: 0
-      seconds: 0
     platform: device
     type: motion
   condition:
@@ -139,12 +131,11 @@
   alias: Verlichting - Verzend notificatie
   trigger:
   - platform: state
-    entity_id: media_player.livingroom_tv
+    entity_id: media_player.livingroom_tv_2
     to: 'off'
-    for:
-      minutes: 2
+    for: 0:02:00
   condition:
-    condition: and
+  - condition: and
     conditions:
     - condition: time
       after: '21:00:00'
@@ -159,6 +150,7 @@
         push:
           badge: 0
           category: lampen
+  mode: single
 - id: '1577872674981'
   alias: Verlichting - Notificatie actie
   trigger:
@@ -253,6 +245,7 @@
       group_name: Buiten
       scene_name: Bright
     service: hue.hue_activate_scene
+  mode: single
 - id: '1581205043194'
   alias: Buiten - Verlichting - Uit
   description: ''

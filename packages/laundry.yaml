@@ -97,7 +97,6 @@ sensor:
           {% else %}
             0
           {% endif %}
-        entity_id: sensor.time
       wasmachine_status_value:
         friendly_name: "Wasmachine status"
         value_template: >-
@@ -141,7 +140,6 @@ sensor:
           {% else %}
             0
           {% endif %}
-        entity_id: sensor.time
       droger_status_value:
         friendly_name: "Droger status"
         value_template: >-
@@ -158,12 +156,12 @@ automation:
     trigger:
     - platform: numeric_state
       entity_id: sensor.wasmachine_watts
-      above: 2
+      above: 5
       for:
         minutes: 5
     - platform: numeric_state
       entity_id: sensor.droger_watts
-      above: 2
+      above: 5
       for:
         minutes: 5
     condition:

@@ -16,7 +16,6 @@ logbook:
       - sensor.last_boot
       - sensor.date
 
-
 # Uncomment this if you are using SSL/TLS, running in Docker container, etc.
 # http:
 #   base_url: example.duckdns.org:8123
@@ -114,32 +113,11 @@ timer:
   hal_overlopen:
     duration: '00:5:00'
 
-#hue:
-#  bridges:
-#    - host: !secret philips_hue_host
-#      allow_unreachable: true
-#      allow_hue_groups: true
-
-nest:
-  client_id: !secret nest_client_id
-  client_secret: !secret nest_client_secret
-
-media_player:
-  - platform: androidtv
-    name: NVidia Shield
-    host: !secret nvidia_shield
-
 webostv:
   - host: !secret lgwebostv_host_1
     name: Livingroom TV
   - host: !secret lgwebostv_host_2
     name: Bedroom TV
-
-#cast:
-#  media_player:
-#  - host: !secret nvidia_shield
-#  - host: !secret lgwebostv_host_1
-#  - host: !secret lgwebostv_host_2
 
 #device_tracker:
   # - platform: google_maps

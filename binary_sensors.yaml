@@ -4,3 +4,18 @@
       friendly_name: Oppas
       value_template: '{{ states.input_boolean.oppas.state == "on" }}'
       device_class: presence
+
+- platform: tod
+  name: daytime
+  after: "06:00"
+  before: "18:00"
+
+- platform: tod
+  name: evening
+  after: "18:00"
+  before: "00:00"
+
+- platform: tod
+  name: nighttime
+  after: "00:00"
+  before: "06:00"

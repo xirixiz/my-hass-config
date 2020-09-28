@@ -254,3 +254,14 @@ automation:
           {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_boolean.wasmachine
           {% elif trigger.entity_id == 'sensor.droger_watts' %}input_boolean.droger
           {% endif %}
+
+  - id: '1577787317848'
+    alias: 'Sensor update Wasmachine/Droger draaitijd'
+    trigger:
+      - platform: time_pattern
+        minutes: '/1'
+    action:
+      - service: homeassistant.update_entity
+        entity_id: sensor.wasmachine_status_time
+      - service: homeassistant.update_entity
+        entity_id: sensor.droger_status_time

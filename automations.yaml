@@ -287,6 +287,10 @@
     domain: light
     entity_id: light.buiten_garage
     type: turn_on
+  - type: turn_on
+    device_id: 98244d710640498d8a48419a483ff435
+    entity_id: switch.apple_tv
+    domain: switch
   - delay: 00:7:30
   - device_id: 4610da9448cc49f497dd9eaa8f0f2e45
     domain: light
@@ -296,6 +300,11 @@
     domain: light
     entity_id: light.buiten_garage
     type: turn_off
+  - type: turn_off
+    device_id: 98244d710640498d8a48419a483ff435
+    entity_id: switch.apple_tv
+    domain: switch
+  mode: single
 - id: '1597609986589'
   alias: Wakker
   description: ''
@@ -314,4 +323,35 @@
       message: Lex is beneden!
       title: Lex wakker
     service: notify.family
+  mode: single
+- id: '1600694311899'
+  alias: Home Assistant - Set Theme on Startup
+  description: ''
+  trigger:
+  - platform: homeassistant
+    event: start
+  condition: []
+  action:
+  - service: frontend.set_theme
+    data:
+      name: ios-dark-mode-blue-red-alternative
+  mode: single
+- id: '1600928113047'
+  alias: Buiten - Temperatuur - Vorst
+  description: ''
+  trigger:
+  - platform: numeric_state
+    entity_id: sensor.buiten_sensor_temperature
+    below: '0'
+    for: '10'
+  condition:
+  - condition: time
+    after: 07:00
+    before: 07:15
+  action:
+  - service: notify.family
+    data:
+      title: Het vriest vandaag!
+      message: Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. De buitentemperatuur
+        is {{ states.sensor.buiten_sensor_temperature.state }} graden!
   mode: single

@@ -3,6 +3,7 @@ homeassistant:
 
 default_config:
 
+
 recorder:
   purge_keep_days: 7
   exclude:
@@ -62,11 +63,13 @@ group: !include groups.yaml
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-frontend: !include frontend.yaml
 sensor: !include sensors.yaml
 binary_sensor: !include binary_sensors.yaml
 input_number: !include input_numbers.yaml
 input_boolean: !include input_booleans.yaml
+#frontend: !include frontend.yaml
+frontend:
+  themes: !include_dir_merge_named themes
 
 #mobile_app:
 
@@ -76,7 +79,7 @@ ios:
       - name: Afval
         identifier: 'afval'
         actions:
-          - identifier: 'MARK_TRASH_MOVED'
+          - identifier: 'MARK_WASTE_MOVED'
             title: 'Afval verwerkt'
             activationMode: 'background'
             authenticationRequired: no

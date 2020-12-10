@@ -3,13 +3,12 @@ homeassistant:
 
 default_config:
 
-
 recorder:
   purge_keep_days: 7
   exclude:
     entities:
-     - sensor.last_boot
-     - sensor.date
+      - sensor.last_boot
+      - sensor.date
 
 logbook:
   exclude:
@@ -23,9 +22,12 @@ logbook:
 
 tts:
   - platform: google_translate
-    language: 'nl'
+    language: "nl"
     service_name: google_say
     base_url: !secret http_url
+    # cache: true
+    # cache_dir: /tmp/tts
+    # time_memory: 300
 
 updater:
   include_used_components: true
@@ -77,29 +79,29 @@ ios:
   push:
     categories:
       - name: Afval
-        identifier: 'afval'
+        identifier: "afval"
         actions:
-          - identifier: 'MARK_WASTE_MOVED'
-            title: 'Afval verwerkt'
-            activationMode: 'background'
+          - identifier: "MARK_WASTE_MOVED"
+            title: "Afval verwerkt"
+            activationMode: "background"
             authenticationRequired: no
             destructive: yes
-            behavior: 'default'
+            behavior: "default"
       - name: Lampen
-        identifier: 'lampen'
+        identifier: "lampen"
         actions:
-          - identifier: 'LAMPEN_UIT'
-            title: 'Lampen uit'
-            activationMode: 'background'
+          - identifier: "LAMPEN_UIT"
+            title: "Lampen uit"
+            activationMode: "background"
             authenticationRequired: no
             destructive: yes
-            behavior: 'default'
-          - identifier: 'DISMISS'
-            title: 'Dismiss'
-            activationMode: 'background'
+            behavior: "default"
+          - identifier: "DISMISS"
+            title: "Dismiss"
+            activationMode: "background"
             authenticationRequired: no
             destructive: no
-            behavior: 'default'
+            behavior: "default"
 
 notify:
   - platform: group
@@ -114,19 +116,25 @@ notify:
 
 timer:
   hal_overlopen:
-    duration: '00:5:00'
+    duration: "00:5:00"
+
+bmw_connected_drive:
+  bmw_640i_xdrive:
+    username: !secret bmw_username
+    password: !secret bmw_password
+    region: rest_of_world
+    read_only: true
 
 webostv:
   - host: !secret lgwebostv_host_1
     name: Livingroom TV
   - host: !secret lgwebostv_host_2
     name: Bedroom TV
-
 #device_tracker:
-  # - platform: google_maps
-  #   username: !secret lieke_gmail
-  #   max_gps_accuracy: 200
-  # - platform: nmap_tracker
-  #   home_interval: 120
-  #   hosts:
-  #     - !secret nmap_hosts
+# - platform: google_maps
+#   username: !secret lieke_gmail
+#   max_gps_accuracy: 200
+# - platform: nmap_tracker
+#   home_interval: 120
+#   hosts:
+#     - !secret nmap_hosts

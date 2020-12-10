@@ -220,26 +220,26 @@
   alias: Buiten - Verlichting - Aan
   description: ''
   trigger:
-  - above: 0
-    below: 10
-    device_id: 3301c784485e43ca92a8576aae1d14c6
+  - type: illuminance
+    platform: device
+    device_id: 3564efe7aedf4465a41cf9f88d14c156
+    entity_id: sensor.buiten_sensor_light_level
     domain: sensor
-    entity_id: sensor.woonkamer_light_level
+    below: 10
     for:
       hours: 0
-      minutes: 1
-      seconds: 0
-    platform: device
-    type: illuminance
+      minutes: 0
+      seconds: 30
+    above: 2
   condition:
   - condition: and
     conditions:
     - condition: state
       entity_id: light.buiten
       state: 'off'
-    - after: '16:00'
-      before: 00:00
-      condition: time
+  - condition: time
+    after: '16:00:00'
+    before: 00:00:00
   action:
   - data:
       group_name: Buiten
@@ -306,7 +306,7 @@
     domain: switch
   mode: single
 - id: '1597609986589'
-  alias: Wakker
+  alias: Kinderen - Wakker - Verzend notificatie
   description: ''
   trigger:
   - device_id: 3301c784485e43ca92a8576aae1d14c6
@@ -316,12 +316,15 @@
     type: motion
   condition:
   - after: 05:00
-    before: 07:30
+    before: 08:00
     condition: time
+  - condition: template
+    value_template: '{{ (as_timestamp(now()) - as_timestamp(states.automation.kinderen_wakker_verzend_notificatie.attributes.last_triggered
+      | default(0)) | int > 10800)}}'
   action:
   - data:
-      message: Lex is beneden!
-      title: Lex wakker
+      title: De kinderen zijn beneden!
+      message: Stelletje boeven!
     service: notify.family
   mode: single
 - id: '1600694311899'
@@ -354,4 +357,66 @@
       title: Het vriest vandaag!
       message: Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. De buitentemperatuur
         is {{ states.sensor.buiten_sensor_temperature.state }} graden!
+  mode: single
+- id: '1601844634937'
+  alias: BMW - Update every 5 minutes
+  description: ''
+  trigger:
+  - platform: time_pattern
+    minutes: /5
+  condition: []
+  action:
+  - service: bmw_connected_drive.update_state
+    data: {}
+  mode: single
+- id: '1601844868829'
+  alias: BMW - Unlock - Verzend notificatie
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.640i_xdrive_door_lock_state
+    from: Locked
+    to: Unlocked
+  condition:
+  - condition: time
+    after: 00:00
+    before: 05:30
+  action:
+  - service: notify.mobile_app_skynet_mobile
+    data:
+      message: De auto is open!
+      title: BMW geopend!
+  - service: tts.google_say
+    data:
+      entity_id: media_player.other_speaker
+      message: De auto is open!
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Buiten
+      scene_name: Bright
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Beneden
+      scene_name: Bright
+  - delay: 00:10:00
+  - service: light.turn_off
+    data: {}
+    entity_id: light.beneden
+  - service: light.turn_off
+    data: {}
+    entity_id: light.buiten
+  mode: single
+- id: '1601849976543'
+  alias: Buiten - Volle maan - Verzend notificatie
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: sensor.moon
+    to: full_moon
+  condition: []
+  action:
+  - service: notify.mobile_app_skynet_mobile
+    data:
+      title: Full moon!
+      message: Full moon!
   mode: single

@@ -1,0 +1,117 @@
+################################################
+## Packages / Power Plugs
+################################################
+homeassistant:
+# customize:
+#   switch.wasmachine:
+#     friendly_name: Wasmachine
+
+################################################
+## REST
+################################################
+rest_command:
+  ventilation_set_speed:
+    url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ speed }}
+    username: !secret ventilation_user
+    password: !secret ventilation_pass
+  ventilation_set_speed_timer:
+    url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ speed }}&timer={{ timer }}
+    username: !secret ventilation_user
+    password: !secret ventilation_pass
+  ventilation_set_voltage:
+    url: http://{{ host }}/api/v2/fan/setvoltage.json?voltage={{ voltage }}
+    username: !secret ventilation_user
+    password: !secret ventilation_pass
+
+################################################
+## FAN
+################################################
+fan:
+  - platform: template
+    fans:
+      mechanische_ventilatie:
+        friendly_name: Mechanische ventilatie
+        value_template: "{{ states('sensor.mechanische_ventilatie_status') }}"
+        speed_template: "{{ state_attr('sensor.mechanische_ventilatie_status', 'speed') }}"
+        turn_on:
+          service: script.ventilation_turn_on_off_dummy
+        turn_off:
+          service: script.ventilation_turn_on_off_dummy
+        set_speed:
+          service: script.ventilation_set_speed
+          data:
+            speed: "{{ speed }}"
+        speeds:
+          - low
+          - medium
+          - high
+          - max
+
+################################################
+## Sensor
+################################################
+sensor:
+  - platform: rest
+    name: Mechanische ventilatie status
+    resource: !secret ventilation_status_url
+    username: !secret ventilation_user
+    password: !secret ventilation_pass
+    value_template: "{% if value_json['result'] == 'ok' %} on {% else %} off {% endif %}"
+    json_attributes_path: $.devices.C0
+    json_attributes:
+      - voltage
+      - percentage
+      - speed
+      - timer
+
+################################################
+## Script
+################################################
+script:
+  ventilation_turn_on_off_dummy:
+    mode: single
+    sequence:
+      - delay:
+          miliseconds: 0
+  ventilation_set_speed:
+    mode: single
+    fields:
+      host:
+        description: Hostname or ip
+      speed:
+        description: Set the fan speed (low/medium/high/max)
+    sequence:
+      - service: rest_command.ventilation_set_speed
+        data:
+          host: !secret ventilation_host
+          speed: "{{ speed }}"
+  ventilation_set_speed_timer:
+    mode: single
+    fields:
+      host:
+        description: Hostname or ip
+      speed:
+        description: Set the fan speed (low/medium/high/max)
+      timer:
+        description: Set the fan timer (number of minutes)
+    sequence:
+      - service: rest_command.ventilation_set_speed_timer
+        data:
+          host: !secret ventilation_host
+          speed: "{{ speed }}"
+          timer: "{{ timer }}"
+  ventilation_set_voltage:
+    mode: single
+    fields:
+      host:
+        description: Hostname or ip
+      voltage:
+        description: Set the fan voltage, between 0.0 and 10.0
+    sequence:
+      - service: rest_command.ventilation_set_voltage
+        data:
+          host: !secret ventilation_host
+          voltage: "{{ voltage }}"
+################################################
+## Automation
+################################################

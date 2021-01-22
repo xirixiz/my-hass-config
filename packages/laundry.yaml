@@ -61,36 +61,36 @@ input_number:
 ## Sensor
 ################################################
 sensor:
-# WASMACHINE
+  # WASMACHINE
   - platform: template
     sensors:
       wasmachine_amps:
         friendly_name_template: "{{ states.switch.wasmachine.name}} Current"
         value_template: '{{ states.switch.wasmachine.attributes["current_a"] | float }}'
-        unit_of_measurement: 'A'
+        unit_of_measurement: "A"
       wasmachine_watts:
         friendly_name_template: "{{ states.switch.wasmachine.name}} Current Consumption"
         value_template: '{{ states.switch.wasmachine.attributes["current_power_w"] | float }}'
-        unit_of_measurement: 'W'
+        unit_of_measurement: "W"
       wasmachine_total_kwh:
         friendly_name_template: "{{ states.switch.wasmachine.name}} Total Consumption"
         value_template: '{{ states.switch.wasmachine.attributes["total_energy_kwh"] | float }}'
-        unit_of_measurement: 'kWh'
+        unit_of_measurement: "kWh"
       wasmachine_volts:
         friendly_name_template: "{{ states.switch.wasmachine.name}} Voltage"
         value_template: '{{ states.switch.wasmachine.attributes["voltage"] | float }}'
-        unit_of_measurement: 'V'
+        unit_of_measurement: "V"
       wasmachine_today_kwh:
         friendly_name_template: "{{ states.switch.wasmachine.name}} Today's Consumption"
         value_template: '{{ states.switch.wasmachine.attributes["today_energy_kwh"] | float }}'
-        unit_of_measurement: 'kWh'
+        unit_of_measurement: "kWh"
       wasmachine_verbruik:
         friendly_name: "Wasmachine verbruik"
         value_template: '{{ (float(states("input_number.wasmachine_stop")) - float(states("input_number.wasmachine_start"))) | round(3) }}'
-        unit_of_measurement: 'kWh'
+        unit_of_measurement: "kWh"
       wasmachine_status_time:
         friendly_name: "Wasmachine draaitijd"
-        unit_of_measurement: 'minuten'
+        unit_of_measurement: "minuten"
         value_template: >-
           {% if is_state('input_boolean.wasmachine', 'on') %}
             {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.wasmachine.last_changed))/60) | round | int }}
@@ -104,36 +104,36 @@ sensor:
           {% else %} Uit
           {% endif %}
 
-# DROGER
+  # DROGER
   - platform: template
     sensors:
       droger_amps:
         friendly_name_template: "{{ states.switch.droger.name}} Current"
         value_template: '{{ states.switch.droger.attributes["current_a"] | float }}'
-        unit_of_measurement: 'A'
+        unit_of_measurement: "A"
       droger_watts:
         friendly_name_template: "{{ states.switch.droger.name}} Current Consumption"
         value_template: '{{ states.switch.droger.attributes["current_power_w"] | float }}'
-        unit_of_measurement: 'W'
+        unit_of_measurement: "W"
       droger_total_kwh:
         friendly_name_template: "{{ states.switch.droger.name}} Total Consumption"
         value_template: '{{ states.switch.droger.attributes["total_energy_kwh"] | float }}'
-        unit_of_measurement: 'kWh'
+        unit_of_measurement: "kWh"
       droger_volts:
         friendly_name_template: "{{ states.switch.droger.name}} Voltage"
         value_template: '{{ states.switch.droger.attributes["voltage"] | float }}'
-        unit_of_measurement: 'V'
+        unit_of_measurement: "V"
       droger_today_kwh:
         friendly_name_template: "{{ states.switch.droger.name}} Today's Consumption"
         value_template: '{{ states.switch.droger.attributes["today_energy_kwh"] | float }}'
-        unit_of_measurement: 'kWh'
+        unit_of_measurement: "kWh"
       droger_verbruik:
         friendly_name: "Droger verbruik"
         value_template: '{{ (float(states("input_number.droger_stop")) - float(states("input_number.droger_start"))) | round(3) }}'
-        unit_of_measurement: 'kWh'
+        unit_of_measurement: "kWh"
       droger_status_time:
         friendly_name: "Droger draaitijd"
-        unit_of_measurement: 'minuten'
+        unit_of_measurement: "minuten"
         value_template: >-
           {% if is_state('input_boolean.droger', 'on') %}
             {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.droger.last_changed))/60) | round | int }}
@@ -145,121 +145,147 @@ sensor:
         value_template: >-
           {% if is_state('input_boolean.droger', 'on') %} Aan
           {% else %} Uit
-          {% endif %}  
+          {% endif %}
 
 ################################################
 ## Automation
 ################################################
 automation:
-  - id: '1577787317846'
+  - id: "1577787317846"
     alias: Waskamer - Wasmachine/droger - Aan
     trigger:
-    - platform: numeric_state
-      entity_id: sensor.wasmachine_watts
-      above: 5
-      for:
-        minutes: 5
-    - platform: numeric_state
-      entity_id: sensor.droger_watts
-      above: 5
-      for:
-        minutes: 5
+      - platform: numeric_state
+        entity_id: sensor.wasmachine_watts
+        above: 5
+        for:
+          minutes: 5
+      - platform: numeric_state
+        entity_id: sensor.droger_watts
+        above: 5
+        for:
+          minutes: 5
     condition:
       condition: or
       conditions:
-      - condition: template
-        value_template: >
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-            {{ is_state('input_boolean.wasmachine', 'off') }}
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}
-            {{ is_state('input_boolean.droger', 'off') }}
-          {% endif %}
+        - condition: template
+          value_template: >
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+              {{ is_state('input_boolean.wasmachine', 'off') }}
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+              {{ is_state('input_boolean.droger', 'off') }}
+            {% endif %}
     action:
-    - service: input_boolean.turn_on
-      data_template:
-        entity_id: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_boolean.wasmachine
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}input_boolean.droger
-          {% endif %}
-    - service: input_number.set_value
-      data_template:
-        entity_id: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_number.wasmachine_start
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}input_number.droger_start
-          {% endif %}
-        value: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-            {{ states.sensor.wasmachine_today_kwh.state }}
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}
-            {{ states.sensor.droger_today_kwh.state }}
-          {% endif %}
-    - service: notify.family
-      data_template:
-        title: "Waskamer:"
-        message: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-            Wasprogramma gestart.
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}
-            Droger gestart.
-          {% endif %}
-  
-  - id: '1577787317847'
+      - service: input_boolean.turn_on
+        data_template:
+          entity_id: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_boolean.wasmachine
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}input_boolean.droger
+            {% endif %}
+      - service: input_number.set_value
+        data_template:
+          entity_id: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_number.wasmachine_start
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}input_number.droger_start
+            {% endif %}
+          value: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+              {{ states.sensor.wasmachine_today_kwh.state }}
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+              {{ states.sensor.droger_today_kwh.state }}
+            {% endif %}
+      - service: notify.family
+        data_template:
+          title: "Waskamer:"
+          message: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+              Wasprogramma gestart.
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+              Droger gestart.
+            {% endif %}
+ #     - service: media_player.volume_set
+ #       data_template:
+ #         entity_id: media_player.unnamed_room
+ #         volume_level: 0.3
+ #     - service: tts.google_say
+ #       entity_id: media_player.unnamed_room
+ #       data_template:
+ #         message: >-
+ #           {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+ #             Het wasprogramma is gestart.
+ #           {% elif trigger.entity_id == 'sensor.droger_watts' %}
+ #             De droger is gestart.
+ #           {% endif %}
+
+  - id: "1577787317847"
     alias: Waskamer - Wasmachine/droger - Uit
     trigger:
-    - platform: numeric_state
-      entity_id: sensor.wasmachine_watts
-      below: 5
-      for:
-        minutes: 5
-    - platform: numeric_state
-      entity_id: sensor.droger_watts
-      below: 5
-      for:
-        minutes: 5
+      - platform: numeric_state
+        entity_id: sensor.wasmachine_watts
+        below: 5
+        for:
+          minutes: 5
+      - platform: numeric_state
+        entity_id: sensor.droger_watts
+        below: 5
+        for:
+          minutes: 5
     condition:
       condition: or
       conditions:
-      - condition: template
-        value_template: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-            {{ is_state('input_boolean.wasmachine', 'on') }}
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}
-            {{ is_state('input_boolean.droger', 'on') }}
-          {% endif %}
+        - condition: template
+          value_template: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+              {{ is_state('input_boolean.wasmachine', 'on') }}
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+              {{ is_state('input_boolean.droger', 'on') }}
+            {% endif %}
     action:
-    - service: input_number.set_value
-      data_template:
-        entity_id: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_number.wasmachine_stop
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}input_number.droger_stop
-          {% endif %}
-        value: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-            {{ states.sensor.wasmachine_today_kwh.state }}
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}
-            {{ states.sensor.droger_today_kwh.state }}
-          {% endif %}
-    - service: notify.family
-      data_template:
-        title: "Waskamer:"
-        message: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-            Wasprogramma gereed. Doorlooptijd: {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.wasmachine.last_changed))/60) | round | int }} minuten. Verbruik: {{ states('sensor.wasmachine_verbruik') }} kWh.
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}
-            Droger gereed. Doorlooptijd: {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.droger.last_changed))/60) | round | int }} minuten. Verbruik: {{ states('sensor.droger_verbruik') }} kWh.
-          {% endif %}
-    - service: input_boolean.turn_off
-      data_template:
-        entity_id: >-
-          {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_boolean.wasmachine
-          {% elif trigger.entity_id == 'sensor.droger_watts' %}input_boolean.droger
-          {% endif %}
+      - service: input_number.set_value
+        data_template:
+          entity_id: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_number.wasmachine_stop
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}input_number.droger_stop
+            {% endif %}
+          value: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+              {{ states.sensor.wasmachine_today_kwh.state }}
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+              {{ states.sensor.droger_today_kwh.state }}
+            {% endif %}
+      - service: notify.family
+        data_template:
+          title: "Waskamer:"
+          message: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+              Wasprogramma gereed. Doorlooptijd: {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.wasmachine.last_changed))/60) | round | int }} minuten. Verbruik: {{ states('sensor.wasmachine_verbruik') }} kWh.
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+              Droger gereed. Doorlooptijd: {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.droger.last_changed))/60) | round | int }} minuten. Verbruik: {{ states('sensor.droger_verbruik') }} kWh.
+            {% endif %}
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: >-
+            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_boolean.wasmachine
+            {% elif trigger.entity_id == 'sensor.droger_watts' %}input_boolean.droger
+            {% endif %}
+#      - service: media_player.volume_set
+#        data_template:
+#          entity_id: media_player.unnamed_room
+#          volume_level: 0.3
+#      - service: tts.google_say
+#        entity_id: media_player.unnamed_room
+#        data_template:
+#          message: >-
+#            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+#              Het wasprogramma is gereed. De doorlooptijd is {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.wasmachine.last_changed))/60) | round | int }} minuten.
+#            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+#              De droger is gereed. De doorlooptijd is {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.droger.last_changed))/60) | round | int }} minuten.
+#            {% endif %}
 
-  - id: '1577787317848'
-    alias: 'Sensor update Wasmachine/Droger draaitijd'
+  - id: "1577787317848"
+    alias: "Sensor update Wasmachine/Droger draaitijd"
     trigger:
       - platform: time_pattern
-        minutes: '/1'
+        minutes: "/1"
     action:
       - service: homeassistant.update_entity
         entity_id: sensor.wasmachine_status_time

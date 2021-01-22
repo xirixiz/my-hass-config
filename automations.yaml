@@ -326,6 +326,22 @@
       title: De kinderen zijn beneden!
       message: Stelletje boeven!
     service: notify.family
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Beneden
+      scene_name: BenedenDimmed
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Woonkamer
+      scene_name: WoonkamerDimmed
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Keuken
+      scene_name: KeukenDimmed
+  - service: hue.hue_activate_scene
+    data:
+      group_name: Hal & Overlopen
+      scene_name: Dimmed
   mode: single
 - id: '1600694311899'
   alias: Home Assistant - Set Theme on Startup
@@ -351,6 +367,9 @@
   - condition: time
     after: 07:00
     before: 07:15
+  - condition: template
+    value_template: '{{ (as_timestamp(now()) - as_timestamp(states.automation.buiten_temperatuur_vorst.attributes.last_triggered
+      | default(0)) | int > 10800)}}'
   action:
   - service: notify.family
     data:

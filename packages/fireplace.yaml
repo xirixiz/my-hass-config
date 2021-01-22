@@ -1,0 +1,75 @@
+################################################
+## Packages
+################################################
+homeassistant:
+# customize:
+#   switch.xxx:
+#     friendly_name: xxx
+
+################################################
+## Inputs
+################################################
+input_number:
+  fireplace_state:
+    name: Fireplace up/down
+    initial: 0
+    min: 0
+    max: 15
+    step: 1
+  fireplace_state_current:
+    name: Fireplace state current
+    initial: 0
+    min: 0
+    max: 15
+    step: 1
+
+################################################
+## Script
+################################################
+script:
+  fireplace_on:
+    alias: "Turn On fireplace"
+    sequence:
+      - service: input_number.set_value
+        data_template:
+          entity_id: input_number.fireplace_state_current
+          value: "{{ states.input_number.fireplace_state.state | int }}"
+      - service: homeassistant.turn_on
+        entity_id: switch.gpio_increase_flame
+      - delay: "00:00:{{ states.input_number.fireplace_state.state | int - states.input_number.fireplace_state_current.state | int }}"
+      - service: homeassistant.turn_off
+        entity_id: switch.gpio_increase_flame
+
+  fireplace_off:
+    alias: "Turn Off fireplace"
+    sequence:
+      - service: homeassistant.turn_on
+        entity_id: switch.gpio_decrease_flame
+      - delay: "00:00:20"
+      - service: homeassistant.turn_off
+        entity_id: switch.gpio_decrease_flame
+
+################################################
+## Automation
+################################################
+automation:
+  - alias: Fireplace Time
+    trigger:
+      platform: state
+      entity_id: input_number.fireplace_state
+    action:
+      - choose:
+          # IF not 0
+          - conditions:
+              - condition: template
+                value_template: "{{ states.input_number.fireplace_state.state | int != 0 }}"
+            sequence:
+              service: homeassistant.turn_on
+              entity_id: script.fireplace_on
+          # ELIF 0
+          - conditions:
+              - condition: template
+                value_template: "{{ states.input_number.fireplace_state.state | int == 0 }}"
+            sequence:
+              service: homeassistant.turn_on
+              entity_id: script.fireplace_off

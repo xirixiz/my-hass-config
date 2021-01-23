@@ -48,6 +48,7 @@ script:
       - service: homeassistant.turn_on
         entity_id: switch.gpio_decrease_flame
       - delay: "00:00:{{ states.input_number.fireplace_state_current.state | int + 2 }}"
+      - delay: "00:00:01"
       - service: homeassistant.turn_off
         entity_id: switch.gpio_decrease_flame
       - service: homeassistant.turn_on
@@ -67,7 +68,7 @@ script:
       - wait_template: "{{ is_state('script.fireplace_decrease', 'off') }}"
       - service: homeassistant.turn_on
         entity_id: switch.gpio_decrease_flame
-      - delay: "00:00:15"
+      - delay: "00:00:{{ states.input_number.fireplace_state_current.state | int + 2 }}"
       - service: homeassistant.turn_off
         entity_id: switch.gpio_decrease_flame
       - service: input_number.set_value

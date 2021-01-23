@@ -10,7 +10,7 @@ homeassistant:
 ## Inputs
 ################################################
 input_number:
-  fireplace_state:
+  fireplace_state_new:
     name: Fireplace up/down
     initial: 0
     min: 0
@@ -33,13 +33,13 @@ script:
       - wait_template: "{{ is_state('script.fireplace_off', 'off') }}"
       - service: homeassistant.turn_on
         entity_id: switch.gpio_increase_flame
-      - delay: "00:00:{{ (states.input_number.fireplace_state.state | int) - (states.input_number.fireplace_state_current.state | int) }}"
+      - delay: "00:00:{{ (states.input_number.fireplace_state_new.state | int) - (states.input_number.fireplace_state_current.state | int) }}"
       - service: homeassistant.turn_off
         entity_id: switch.gpio_increase_flame
       - service: input_number.set_value
         data_template:
           entity_id: input_number.fireplace_state_current
-          value: "{{ states.input_number.fireplace_state.state | int }}"
+          value: "{{ states.input_number.fireplace_state_new.state | int }}"
 
   fireplace_decrease:
     alias: "Fireplace - Decrease"
@@ -47,13 +47,13 @@ script:
       - wait_template: "{{ is_state('script.fireplace_off', 'off') }}"
       - service: homeassistant.turn_on
         entity_id: switch.gpio_decrease_flame
-      - delay: "00:00:{{ (states.input_number.fireplace_state_current.state | int) - (states.input_number.fireplace_state.state | int) }}"
+      - delay: "00:00:{{ (states.input_number.fireplace_state_current.state | int) - (states.input_number.fireplace_state_new.state | int) }}"
       - service: homeassistant.turn_off
         entity_id: switch.gpio_decrease_flame
       - service: input_number.set_value
         data_template:
           entity_id: input_number.fireplace_state_current
-          value: "{{ states.input_number.fireplace_state.state | int }}"
+          value: "{{ states.input_number.fireplace_state_new.state | int }}"
 
   fireplace_off:
     alias: "Fireplace - Off"
@@ -67,7 +67,7 @@ script:
         entity_id: switch.gpio_decrease_flame
       - service: input_number.set_value
         data_template:
-          entity_id: input_number.fireplace_state
+          entity_id: input_number.fireplace_state_new
           value: "0"
       - service: input_number.set_value
         data_template:
@@ -81,7 +81,7 @@ automation:
   - alias: Fireplace Time
     trigger:
       platform: state
-      entity_id: input_number.fireplace_state
+      entity_id: input_number.fireplace_state_new
     action:
       - choose:
           # IF not 0
@@ -89,9 +89,9 @@ automation:
               - condition: template
                 value_template: "{{ trigger.from_state.state != trigger.to_state.state }}"
               - condition: template
-                value_template: "{{ states.input_number.fireplace_state.state | int != 0 }}"
+                value_template: "{{ states.input_number.fireplace_state_new.state | int != 0 }}"
               - condition: template
-                value_template: "{{ (states.input_number.fireplace_state.state | int) > (states.input_number.fireplace_state_current.state | int) }}"
+                value_template: "{{ (states.input_number.fireplace_state_new.state | int) > (states.input_number.fireplace_state_current.state | int) }}"
             sequence:
               - service: homeassistant.turn_on
                 entity_id: script.fireplace_increase
@@ -100,9 +100,9 @@ automation:
               - condition: template
                 value_template: "{{ trigger.from_state.state != trigger.to_state.state }}"
               - condition: template
-                value_template: "{{ states.input_number.fireplace_state.state | int != 0 }}"
+                value_template: "{{ states.input_number.fireplace_state_new.state | int != 0 }}"
               - condition: template
-                value_template: "{{ (states.input_number.fireplace_state.state) | int < (states.input_number.fireplace_state_current.state | int) }}"
+                value_template: "{{ (states.input_number.fireplace_state_new.state) | int < (states.input_number.fireplace_state_current.state | int) }}"
             sequence:
               service: homeassistant.turn_on
               entity_id: script.fireplace_decrease
@@ -111,7 +111,7 @@ automation:
               - condition: template
                 value_template: "{{ trigger.from_state.state != trigger.to_state.state }}"
               - condition: template
-                value_template: "{{ states.input_number.fireplace_state.state | int == 0 }}"
+                value_template: "{{ states.input_number.fireplace_state_new.state | int == 0 }}"
             sequence:
               service: homeassistant.turn_on
               entity_id: script.fireplace_off

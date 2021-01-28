@@ -41,6 +41,9 @@ logger:
     #homeassistant.components.scrape: debug
 
 lovelace:
+  resources:
+    - url: /local/multiple-entity-row.js?v=4.1.1
+      type: module
 
 #influxdb:
 #  host: 192.168.1.15

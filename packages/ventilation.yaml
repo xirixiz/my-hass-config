@@ -64,7 +64,7 @@ sensor:
       {% else %}
         off
       {% endif %}
-    json_attributes_path: $.devices.C0 # This might be different for each fan.
+    json_attributes_path: "$.devices.*" # This might be different for each fan.
     json_attributes:
       - voltage
       - percentage

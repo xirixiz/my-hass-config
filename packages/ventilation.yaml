@@ -55,6 +55,7 @@ fan:
 sensor:
   - platform: rest
     name: Mechanische ventilatie status
+    scan_interval: 120
     resource: !secret nrf905_status_url
     username: !secret nrf905_username
     password: !secret nrf905_password
@@ -78,8 +79,7 @@ script:
   ventilation_turn_on_off_dummy:
     mode: single
     sequence:
-      - delay:
-          miliseconds: 0
+      - delay: 1
   ventilation_set_speed:
     mode: single
     fields:

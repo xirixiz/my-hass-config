@@ -22,6 +22,10 @@ rest_command:
     url: http://{{ host }}/api/v2/fan/setvoltage.json?voltage={{ voltage }}
     username: !secret nrf905_username
     password: !secret nrf905_password
+  ventilation_reboot:
+    url: http://{{ host }}/api/v1/systemconfig.json?reset=true
+    username: !secret nrf905_username
+    password: !secret nrf905_password
 
 ################################################
 ## FAN
@@ -131,6 +135,29 @@ script:
       - service: homeassistant.update_entity
         data:
           entity_id: sensor.mechanische_ventilatie_status
+
+  ventilation_reboot:
+    mode: single
+    fields:
+      host:
+        description: Hostname or ip
+    sequence:
+      - service: rest_command.ventilation_reboot
+        data:
+          host: !secret nrf905_host
+      - delay: 15
+      - service: homeassistant.update_entity
+        data:
+          entity_id: sensor.mechanische_ventilatie_status
+
 ################################################
 ## Automation
 ################################################
+automation:
+  - alias: ventilatie - Herstart ESP
+    trigger:
+      platform: time_pattern
+      hours: "/1"
+    action:
+      service: script.turn_on
+      entity_id: script.ventilation_reboot

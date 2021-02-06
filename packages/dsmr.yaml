@@ -3,10 +3,10 @@
 ################################################
 homeassistant:
   customize:
-    sensor.electricity1:
+    sensor.dsmr_electricity:
       friendly_name: Electricity Today
       icon: mdi:power-plug
-    sensor.gas:
+    sensor.dsmr_gas:
       friendly_name: Gas Today
       icon: mdi:power-plug
 
@@ -15,7 +15,7 @@ homeassistant:
 ################################################
 sensor:
   - platform: rest
-    name: electricity
+    name: dsmr_electricity
     resource: !secret dsmr_today
     unit_of_measurement: "kWh"
     value_template: "{{ value_json.electricity1 | round(2) }}"
@@ -23,7 +23,7 @@ sensor:
       X-AUTHKEY: !secret dsmr_token
 
   - platform: rest
-    name: gas
+    name: dsmr_gas
     resource: !secret dsmr_today
     unit_of_measurement: "m³"
     value_template: "{{ value_json.gas | round(2) }}"

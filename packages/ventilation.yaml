@@ -145,7 +145,7 @@ script:
       - service: rest_command.ventilation_reboot
         data:
           host: !secret nrf905_host
-      - delay: 15
+      - delay: 5
       - service: homeassistant.update_entity
         data:
           entity_id: sensor.mechanische_ventilatie_status

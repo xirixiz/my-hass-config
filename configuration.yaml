@@ -130,13 +130,6 @@ webostv:
     name: Livingroom TV
   - host: !secret lgwebostv_host_2
     name: Bedroom TV
-
-sensor:
-  - platform: tautulli
-    api_key: !secret tautulli_token
-    host: !secret tautulli_url
-    port: !secret tautulli_port
-
 #device_tracker:
 # - platform: google_maps
 #   username: !secret lieke_gmail

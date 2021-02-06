@@ -1,0 +1,31 @@
+################################################
+## Packages / Dsmr
+################################################
+homeassistant:
+  customize:
+    sensor.electricity1:
+      friendly_name: Electricity Today
+      icon: mdi:power-plug
+    sensor.gas:
+      friendly_name: Gas Today
+      icon: mdi:power-plug
+
+################################################
+## Sensor
+################################################
+sensor:
+  - platform: rest
+    name: electricity_today
+    resource: !secret dsmr_today
+    unit_of_measurement: "kWh"
+    value_template: "{{ value_json.electricity1 | round(3) }}"
+    headers:
+      X-AUTHKEY: !secret dsmr_token
+
+  - platform: rest
+    name: gas_today
+    resource: !secret dsmr_today
+    unit_of_measurement: "m³"
+    value_template: "{{ value_json.gas | round(3) }}"
+    headers:
+      X-AUTHKEY: !secret dsmr_token

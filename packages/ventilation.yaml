@@ -56,25 +56,59 @@ fan:
 ################################################
 ## Sensor
 ################################################
+# sensor:
+#   - platform: rest
+#     name: Mechanische ventilatie status
+#     scan_interval: 300
+#     resource: !secret nrf905_status_url
+#     username: !secret nrf905_username
+#     password: !secret nrf905_password
+#     value_template: >
+#       {% if value_json['result'] == 'ok' %}
+#         on
+#       {% else %}
+#         off
+#       {% endif %}
+#     json_attributes_path: "$.devices.*" # This might be different for each fan.
+#     json_attributes:
+#       - voltage
+#       - percentage
+#       - speed
+#       - timer
+
+input_text:
+  ventilatie_status_low:
+    name: Ventilatie Low
+    initial: " "
+  ventilatie_status_medium:
+    name: Ventilatie Medium
+    initial: " "
+  ventilatie_status_high:
+    name: Ventilatie High
+    initial: " "
+  ventilatie_status_max:
+    name: Ventilatie Max
+    initial: " "
+
 sensor:
-  - platform: rest
-    name: Mechanische ventilatie status
-    scan_interval: 120
-    resource: !secret nrf905_status_url
-    username: !secret nrf905_username
-    password: !secret nrf905_password
-    value_template: >
-      {% if value_json['result'] == 'ok' %}
-        on
-      {% else %}
-        off
-      {% endif %}
-    json_attributes_path: "$.devices.*" # This might be different for each fan.
-    json_attributes:
-      - voltage
-      - percentage
-      - speed
-      - timer
+  - platform: template
+    sensors:
+      ventilatie_status_low:
+        friendly_name: Ventilatie Low
+        value_template: >
+          {{ states('input_text.ventilatie_status_low') }}
+      ventilatie_status_medium:
+        friendly_name: Ventilatie Medium
+        value_template: >
+          {{ states('input_text.ventilatie_status_medium') }}
+      ventilatie_status_high:
+        friendly_name: Ventilatie High
+        value_template: >
+          {{ states('input_text.ventilatie_status_high') }}
+      ventilatie_status_max:
+        friendly_name: Ventilatie Max
+        value_template: >
+          {{ states('input_text.ventilatie_status_max') }}
 
 ################################################
 ## Script
@@ -149,15 +183,103 @@ script:
       - service: homeassistant.update_entity
         data:
           entity_id: sensor.mechanische_ventilatie_status
-
 ################################################
 ## Automation
 ################################################
-automation:
-  - alias: ventilatie - Herstart ESP
-    trigger:
-      platform: time_pattern
-      hours: "/1"
-    action:
-      service: script.turn_on
-      entity_id: script.ventilation_reboot
+# automation:
+#   - alias: Ventilatie - Herstart ESP
+#     trigger:
+#       platform: time_pattern
+#       minutes: "/10"
+#     action:
+#       service: script.turn_on
+#       entity_id: script.ventilation_reboot
+
+# LOVELACE
+# type: entities
+# show_header_toggle: false
+# entities:
+#   - entity: switch.mechanische_ventilatie
+#   - type: 'custom:multiple-entity-row'
+#     entity: sensor.mechanische_ventilatie_status
+#     attribute: speed
+#     name: Stand
+#     icon: 'mdi:speedometer'
+#     entities:
+#       - entity: sensor.mechanische_ventilatie_status
+#         icon: 'mdi:fan-speed-1'
+#         name: Laag
+#         tap_action:
+#           action: call-service
+#           service: script.ventilation_set_speed
+#           service_data:
+#             speed: low
+#       - entity: sensor.mechanische_ventilatie_status
+#         icon: 'mdi:fan-speed-2'
+#         name: Medium
+#         tap_action:
+#           action: call-service
+#           service: script.ventilation_set_speed
+#           service_data:
+#             speed: medium
+#       - entity: sensor.mechanische_ventilatie_status
+#         icon: 'mdi:fan-speed-3'
+#         name: Hoog
+#         tap_action:
+#           action: call-service
+#           service: script.ventilation_set_speed
+#           service_data:
+#             speed: high
+#       - entity: sensor.mechanische_ventilatie_status
+#         icon: 'mdi:fan-plus'
+#         name: Max
+#         tap_action:
+#           action: call-service
+#           service: script.ventilation_set_speed
+#           service_data:
+#             speed: max
+#   - type: 'custom:multiple-entity-row'
+#     entity: sensor.mechanische_ventilatie_status
+#     attribute: timer
+#     name: Timer
+#     icon: 'mdi:timer'
+#     entities:
+#       - entity: sensor.mechanische_ventilatie_status
+#         icon: 'mdi:clock-time-two-outline'
+#         name: 10m
+#         tap_action:
+#           action: call-service
+#           service: script.ventilation_set_speed_timer
+#           service_data:
+#             speed: high
+#             timer: 10
+#       - entity: sensor.mechanische_ventilatie_status
+#         icon: 'mdi:clock-time-six-outline'
+#         name: 30m
+#         tap_action:
+#           action: call-service
+#           service: script.ventilation_set_speed_timer
+#           service_data:
+#             speed: high
+#             timer: 30
+#       - entity: sensor.mechanische_ventilatie_status
+#         icon: 'mdi:clock-time-twelve-outline'
+#         name: 60m
+#         tap_action:
+#           action: call-service
+#           service: script.ventilation_set_speed_timer
+#           service_data:
+#             speed: high
+#             timer: 60
+#   - type: attribute
+#     entity: sensor.mechanische_ventilatie_status
+#     attribute: percentage
+#     name: Percentage
+#     icon: 'mdi:percent-outline'
+#     suffix: '%'
+#   - type: attribute
+#     entity: sensor.mechanische_ventilatie_status
+#     attribute: voltage
+#     name: Voltage
+#     icon: 'mdi:flash'
+#     suffix: v

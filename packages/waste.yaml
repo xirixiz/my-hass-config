@@ -55,15 +55,16 @@ sensor:
     provider: mijnafvalwijzer
     postal_code: !secret afvalwijzer_postcode
     street_number: !secret afvalwijzer_huisnummer
+  # exclude_list: ""
 
-  - platform: afvalwijzer
-    provider: mijnafvalwijzer
-    postal_code: 5384TC
-    street_number: 5
-    suffix: A
-    id: test
+  # - platform: afvalwijzer
+  #   provider: mijnafvalwijzer
+  #   postal_code: 5384TC
+  #   street_number: 5
+  #   suffix: A
+  #   id: test
 
-    # default_label: 'Geen'
+  # default_label: 'Geen'
   - platform: template
     sensors:
       afvalwijzer_next_item_formatted:

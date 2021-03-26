@@ -111,10 +111,11 @@
     platform: time
   condition: []
   action:
-  - entity_id: light.slaapkamer_lex
+  - entity_id: light.slaapkamer_lex_disabled
     service: light.turn_on
   - entity_id: light.slaapkamer_boris
     service: light.turn_on
+  mode: single
 - id: '1577872674979'
   alias: Slaapkamer Lex en Boris - Verlichting - Uit
   description: ''
@@ -438,4 +439,39 @@
     data:
       title: Full moon!
       message: Full moon!
+  mode: single
+- id: '1612883551714'
+  alias: Badkamer - Motion - Ventilatie - Aan
+  description: ''
+  trigger:
+  - type: motion
+    platform: device
+    device_id: 1dd23b20c53c1c11f3e0635bbe6c21a2
+    entity_id: binary_sensor.hue_outdoor_motion_sensor_1_motion
+    domain: binary_sensor
+  condition: []
+  action:
+  - service: script.ventilation_set_speed
+    data:
+      speed: max
+  mode: single
+- id: '1612883633643'
+  alias: Badkamer - Motion - Ventilatie - Uit
+  description: ''
+  trigger:
+  - type: no_motion
+    platform: device
+    device_id: 1dd23b20c53c1c11f3e0635bbe6c21a2
+    entity_id: binary_sensor.hue_outdoor_motion_sensor_1_motion
+    domain: binary_sensor
+    for:
+      hours: 0
+      minutes: 15
+      seconds: 0
+      milliseconds: 0
+  condition: []
+  action:
+  - service: script.ventilation_set_speed
+    data:
+      speed: low
   mode: single

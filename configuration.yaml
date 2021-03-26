@@ -125,6 +125,14 @@ bmw_connected_drive:
     region: rest_of_world
     read_only: true
 
+climate:
+
+nest:
+  client_id: !secret nest_client_id
+  client_secret: !secret nest_client_secret
+  project_id: !secret nest_client_project_id
+  subscriber_id: !secret nest_client_subscriber_id
+
 webostv:
   - host: !secret lgwebostv_host_1
     name: Livingroom TV

@@ -10,11 +10,11 @@ homeassistant:
 ## REST
 ################################################
 rest_command:
-  ventilation_set_speed:
+  ventilation_set_preset_mode:
     url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ speed }}
     username: !secret nrf905_username
     password: !secret nrf905_password
-  ventilation_set_speed_timer:
+  ventilation_set_preset_mode_timer:
     url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ speed }}&timer={{ timer }}
     username: !secret nrf905_username
     password: !secret nrf905_password
@@ -37,21 +37,39 @@ fan:
         friendly_name: Mechanische ventilatie
         value_template: >
           {{ states('sensor.mechanische_ventilatie_status') }}
-        speed_template: >
-          {{ state_attr('sensor.mechanische_ventilatie_status', 'speed') }}
         turn_on:
           service: script.ventilation_turn_on_off_dummy
         turn_off:
           service: script.ventilation_turn_on_off_dummy
-        set_speed:
-          service: script.ventilation_set_speed
+        preset_mode_template: >
+          {{ state_attr('sensor.mechanische_ventilatie_status', 'speed') }}
+        set_preset_mode:
+          service: script.ventilation_set_preset_mode
           data:
             speed: "{{ speed }}"
-        speeds:
+        preset_modes:
           - low
           - medium
           - high
           - max
+
+
+      living_room_fan:
+        friendly_name: "Living room fan"
+        value_template: "{{ states('light.inovelli_lzw36_fan_dimmer') }}"
+        speed_count: 3
+        percentage_template: "{{ (state_attr('light.inovelli_lzw36_fan_dimmer','brightness') | int /255*100) | int}}"
+        turn_on:
+          service: light.turn_on
+          entity_id: light.inovelli_lzw36_fan_dimmer
+        turn_off:
+          service: light.turn_off
+          entity_id: light.inovelli_lzw36_fan_dimmer
+        set_percentage:
+          service: light.turn_on
+          entity_id: light.inovelli_lzw36_fan_dimmer
+          data_template:
+            brightness_pct: "{{ percentage }}"
 
 ################################################
 ## Sensor
@@ -118,7 +136,7 @@ script:
     mode: single
     sequence:
       - delay: 1
-  ventilation_set_speed:
+  ventilation_set_preset_mode:
     mode: single
     fields:
       host:
@@ -126,7 +144,7 @@ script:
       speed:
         description: Set the fan speed (low/medium/high/max)
     sequence:
-      - service: rest_command.ventilation_set_speed
+      - service: rest_command.ventilation_set_preset_mode
         data:
           host: !secret nrf905_host
           speed: "{{ speed }}"
@@ -134,7 +152,7 @@ script:
       - service: homeassistant.update_entity
         data:
           entity_id: sensor.mechanische_ventilatie_status
-  ventilation_set_speed_timer:
+  ventilation_set_preset_mode_timer:
     mode: single
     fields:
       host:
@@ -144,7 +162,7 @@ script:
       timer:
         description: Set the fan timer (number of minutes)
     sequence:
-      - service: rest_command.ventilation_set_speed_timer
+      - service: rest_command.ventilation_set_preset_mode_timer
         data:
           host: !secret nrf905_host
           speed: "{{ speed }}"
@@ -211,7 +229,7 @@ script:
 #         name: Laag
 #         tap_action:
 #           action: call-service
-#           service: script.ventilation_set_speed
+#           service: script.ventilation_set_preset_mode
 #           service_data:
 #             speed: low
 #       - entity: sensor.mechanische_ventilatie_status
@@ -219,7 +237,7 @@ script:
 #         name: Medium
 #         tap_action:
 #           action: call-service
-#           service: script.ventilation_set_speed
+#           service: script.ventilation_set_preset_mode
 #           service_data:
 #             speed: medium
 #       - entity: sensor.mechanische_ventilatie_status
@@ -227,7 +245,7 @@ script:
 #         name: Hoog
 #         tap_action:
 #           action: call-service
-#           service: script.ventilation_set_speed
+#           service: script.ventilation_set_preset_mode
 #           service_data:
 #             speed: high
 #       - entity: sensor.mechanische_ventilatie_status
@@ -235,7 +253,7 @@ script:
 #         name: Max
 #         tap_action:
 #           action: call-service
-#           service: script.ventilation_set_speed
+#           service: script.ventilation_set_preset_mode
 #           service_data:
 #             speed: max
 #   - type: 'custom:multiple-entity-row'
@@ -249,7 +267,7 @@ script:
 #         name: 10m
 #         tap_action:
 #           action: call-service
-#           service: script.ventilation_set_speed_timer
+#           service: script.ventilation_set_preset_mode_timer
 #           service_data:
 #             speed: high
 #             timer: 10
@@ -258,7 +276,7 @@ script:
 #         name: 30m
 #         tap_action:
 #           action: call-service
-#           service: script.ventilation_set_speed_timer
+#           service: script.ventilation_set_preset_mode_timer
 #           service_data:
 #             speed: high
 #             timer: 30
@@ -267,7 +285,7 @@ script:
 #         name: 60m
 #         tap_action:
 #           action: call-service
-#           service: script.ventilation_set_speed_timer
+#           service: script.ventilation_set_preset_mode_timer
 #           service_data:
 #             speed: high
 #             timer: 60

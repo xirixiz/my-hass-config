@@ -451,7 +451,7 @@
     domain: binary_sensor
   condition: []
   action:
-  - service: script.ventilation_set_speed
+  - service: script.ventilation_set_preset_mode
     data:
       speed: max
   mode: single
@@ -471,7 +471,7 @@
       milliseconds: 0
   condition: []
   action:
-  - service: script.ventilation_set_speed
+  - service: script.ventilation_set_preset_mode
     data:
       speed: low
   mode: single

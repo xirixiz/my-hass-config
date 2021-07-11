@@ -451,6 +451,19 @@
     domain: binary_sensor
   condition: []
   action:
+  - type: turn_off
+    device_id: a01ef0e097ce68abf5244f43bf54a21f
+    entity_id: switch.cv_ketel
+    domain: switch
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 10
+      milliseconds: 0
+  - type: turn_on
+    device_id: a01ef0e097ce68abf5244f43bf54a21f
+    entity_id: switch.cv_ketel
+    domain: switch
   - service: script.ventilation_set_preset_mode
     data:
       speed: max

@@ -10,20 +10,16 @@ homeassistant:
 ## REST
 ################################################
 rest_command:
-  ventilation_set_preset_mode:
-    url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ speed }}
+  ventilation_preset_mode:
+    url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ preset_mode }}
     username: !secret nrf905_username
     password: !secret nrf905_password
-  ventilation_set_preset_mode_timer:
+  ventilation_set_speed_timer:
     url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ speed }}&timer={{ timer }}
     username: !secret nrf905_username
     password: !secret nrf905_password
   ventilation_set_voltage:
     url: http://{{ host }}/api/v2/fan/setvoltage.json?voltage={{ voltage }}
-    username: !secret nrf905_username
-    password: !secret nrf905_password
-  ventilation_reboot:
-    url: http://{{ host }}/api/v1/systemconfig.json?reset=true
     username: !secret nrf905_username
     password: !secret nrf905_password
 
@@ -37,96 +33,52 @@ fan:
         friendly_name: Mechanische ventilatie
         value_template: >
           {{ states('sensor.mechanische_ventilatie_status') }}
+        availability_template: >
+          {{ states('sensor.mechanische_ventilatie_status') }}
+        percentage_template: >
+          {{ state_attr('sensor.mechanische_ventilatie_status', 'percentage') }}
+        preset_mode_template: >
+          {{ state_attr('sensor.mechanische_ventilatie_status', 'speed') }}
         turn_on:
           service: script.ventilation_turn_on_off_dummy
         turn_off:
           service: script.ventilation_turn_on_off_dummy
-        preset_mode_template: >
-          {{ state_attr('sensor.mechanische_ventilatie_status', 'speed') }}
+        set_percentage:
+          service: script.ventilation_set_voltage
+          data:
+            voltage: "{{ percentage / 10 }}"
         set_preset_mode:
           service: script.ventilation_set_preset_mode
           data:
-            speed: "{{ speed }}"
+            preset_mode: "{{ preset_mode }}"
         preset_modes:
           - low
           - medium
           - high
           - max
 
-
-      living_room_fan:
-        friendly_name: "Living room fan"
-        value_template: "{{ states('light.inovelli_lzw36_fan_dimmer') }}"
-        speed_count: 3
-        percentage_template: "{{ (state_attr('light.inovelli_lzw36_fan_dimmer','brightness') | int /255*100) | int}}"
-        turn_on:
-          service: light.turn_on
-          entity_id: light.inovelli_lzw36_fan_dimmer
-        turn_off:
-          service: light.turn_off
-          entity_id: light.inovelli_lzw36_fan_dimmer
-        set_percentage:
-          service: light.turn_on
-          entity_id: light.inovelli_lzw36_fan_dimmer
-          data_template:
-            brightness_pct: "{{ percentage }}"
-
 ################################################
 ## Sensor
 ################################################
-# sensor:
-#   - platform: rest
-#     name: Mechanische ventilatie status
-#     scan_interval: 300
-#     resource: !secret nrf905_status_url
-#     username: !secret nrf905_username
-#     password: !secret nrf905_password
-#     value_template: >
-#       {% if value_json['result'] == 'ok' %}
-#         on
-#       {% else %}
-#         off
-#       {% endif %}
-#     json_attributes_path: "$.devices.*" # This might be different for each fan.
-#     json_attributes:
-#       - voltage
-#       - percentage
-#       - speed
-#       - timer
-
-input_text:
-  ventilatie_status_low:
-    name: Ventilatie Low
-    initial: " "
-  ventilatie_status_medium:
-    name: Ventilatie Medium
-    initial: " "
-  ventilatie_status_high:
-    name: Ventilatie High
-    initial: " "
-  ventilatie_status_max:
-    name: Ventilatie Max
-    initial: " "
-
 sensor:
-  - platform: template
-    sensors:
-      ventilatie_status_low:
-        friendly_name: Ventilatie Low
-        value_template: >
-          {{ states('input_text.ventilatie_status_low') }}
-      ventilatie_status_medium:
-        friendly_name: Ventilatie Medium
-        value_template: >
-          {{ states('input_text.ventilatie_status_medium') }}
-      ventilatie_status_high:
-        friendly_name: Ventilatie High
-        value_template: >
-          {{ states('input_text.ventilatie_status_high') }}
-      ventilatie_status_max:
-        friendly_name: Ventilatie Max
-        value_template: >
-          {{ states('input_text.ventilatie_status_max') }}
+  - platform: rest
+    name: Mechanische ventilatie status
+    resource: !secret nrf905_status_url
+    username: !secret nrf905_username
+    password: !secret nrf905_password
+    value_template: >
+      {% if value_json['result'] == 'ok' %}
+        on
+      {% else %}
+        off
+      {% endif %}
+    # json_attributes_path: $.devices.C0 # This will be different for each fan.
+    json_attributes_path: "$.devices.*" # This might be different for each fan.
+    json_attributes:
+      - voltage
+      - percentage
+      - speed
+      - timer
 
 ################################################
 ## Script
@@ -141,18 +93,18 @@ script:
     fields:
       host:
         description: Hostname or ip
-      speed:
-        description: Set the fan speed (low/medium/high/max)
+      preset_mode:
+        description: Set the fan preset mode (low/medium/high/max)
     sequence:
-      - service: rest_command.ventilation_set_preset_mode
+      - service: rest_command.ventilation_preset_mode
         data:
           host: !secret nrf905_host
-          speed: "{{ speed }}"
+          preset_mode: "{{ preset_mode }}"
       - delay: 1
       - service: homeassistant.update_entity
         data:
           entity_id: sensor.mechanische_ventilatie_status
-  ventilation_set_preset_mode_timer:
+  ventilation_set_speed_timer:
     mode: single
     fields:
       host:
@@ -162,7 +114,7 @@ script:
       timer:
         description: Set the fan timer (number of minutes)
     sequence:
-      - service: rest_command.ventilation_set_preset_mode_timer
+      - service: rest_command.ventilation_set_speed_timer
         data:
           host: !secret nrf905_host
           speed: "{{ speed }}"
@@ -187,52 +139,38 @@ script:
       - service: homeassistant.update_entity
         data:
           entity_id: sensor.mechanische_ventilatie_status
-
-  ventilation_reboot:
-    mode: single
-    fields:
-      host:
-        description: Hostname or ip
-    sequence:
-      - service: rest_command.ventilation_reboot
-        data:
-          host: !secret nrf905_host
-      - delay: 5
-      - service: homeassistant.update_entity
-        data:
-          entity_id: sensor.mechanische_ventilatie_status
 ################################################
 ## Automation
 ################################################
-# automation:
-#   - alias: Ventilatie - Herstart ESP
-#     trigger:
-#       platform: time_pattern
-#       minutes: "/10"
-#     action:
-#       service: script.turn_on
-#       entity_id: script.ventilation_reboot
-
+automation:
+  - alias: Ventilatie - Herstart ESP
+    trigger:
+      - platform: time_pattern
+        minutes: "/15"
+    action:
+      - service: homeassistant.turn_off
+        entity_id: switch.mechanische_ventilatie
+      - delay: "00:00:10"
+      - service: homeassistant.turn_on
+        entity_id: switch.mechanische_ventilatie
 # LOVELACE
 # type: entities
 # show_header_toggle: false
 # entities:
-#   - entity: switch.mechanische_ventilatie
 #   - type: 'custom:multiple-entity-row'
-#     entity: sensor.mechanische_ventilatie_status
-#     attribute: speed
-#     name: Stand
+#     entity: sensor.ventilatie_status_low
+#     name: Ventilation Level
 #     icon: 'mdi:speedometer'
 #     entities:
-#       - entity: sensor.mechanische_ventilatie_status
+#       - entity: sensor.ventilatie_status_low
 #         icon: 'mdi:fan-speed-1'
-#         name: Laag
+#         name: Low
 #         tap_action:
 #           action: call-service
 #           service: script.ventilation_set_preset_mode
 #           service_data:
 #             speed: low
-#       - entity: sensor.mechanische_ventilatie_status
+#       - entity: sensor.ventilatie_status_medium
 #         icon: 'mdi:fan-speed-2'
 #         name: Medium
 #         tap_action:
@@ -240,64 +178,11 @@ script:
 #           service: script.ventilation_set_preset_mode
 #           service_data:
 #             speed: medium
-#       - entity: sensor.mechanische_ventilatie_status
+#       - entity: sensor.ventilatie_status_high
 #         icon: 'mdi:fan-speed-3'
-#         name: Hoog
+#         name: High
 #         tap_action:
 #           action: call-service
 #           service: script.ventilation_set_preset_mode
 #           service_data:
 #             speed: high
-#       - entity: sensor.mechanische_ventilatie_status
-#         icon: 'mdi:fan-plus'
-#         name: Max
-#         tap_action:
-#           action: call-service
-#           service: script.ventilation_set_preset_mode
-#           service_data:
-#             speed: max
-#   - type: 'custom:multiple-entity-row'
-#     entity: sensor.mechanische_ventilatie_status
-#     attribute: timer
-#     name: Timer
-#     icon: 'mdi:timer'
-#     entities:
-#       - entity: sensor.mechanische_ventilatie_status
-#         icon: 'mdi:clock-time-two-outline'
-#         name: 10m
-#         tap_action:
-#           action: call-service
-#           service: script.ventilation_set_preset_mode_timer
-#           service_data:
-#             speed: high
-#             timer: 10
-#       - entity: sensor.mechanische_ventilatie_status
-#         icon: 'mdi:clock-time-six-outline'
-#         name: 30m
-#         tap_action:
-#           action: call-service
-#           service: script.ventilation_set_preset_mode_timer
-#           service_data:
-#             speed: high
-#             timer: 30
-#       - entity: sensor.mechanische_ventilatie_status
-#         icon: 'mdi:clock-time-twelve-outline'
-#         name: 60m
-#         tap_action:
-#           action: call-service
-#           service: script.ventilation_set_preset_mode_timer
-#           service_data:
-#             speed: high
-#             timer: 60
-#   - type: attribute
-#     entity: sensor.mechanische_ventilatie_status
-#     attribute: percentage
-#     name: Percentage
-#     icon: 'mdi:percent-outline'
-#     suffix: '%'
-#   - type: attribute
-#     entity: sensor.mechanische_ventilatie_status
-#     attribute: voltage
-#     name: Voltage
-#     icon: 'mdi:flash'
-#     suffix: v

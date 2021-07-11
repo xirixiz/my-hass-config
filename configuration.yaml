@@ -118,12 +118,12 @@ timer:
   hal_overlopen:
     duration: "00:5:00"
 
-bmw_connected_drive:
-  bmw_640i_xdrive:
-    username: !secret bmw_username
-    password: !secret bmw_password
-    region: rest_of_world
-    read_only: true
+# bmw_connected_drive:
+#   bmw_640i_xdrive:
+#     username: !secret bmw_username
+#     password: !secret bmw_password
+#     region: rest_of_world
+#     read_only: true
 
 climate:
 

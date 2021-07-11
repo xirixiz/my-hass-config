@@ -198,23 +198,23 @@ automation:
           title: "Waskamer:"
           message: >-
             {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-              Wasprogramma gestart.
+              Wasprogramma gestart - Tijdstip: {{now().strftime("%H:%M")}}
             {% elif trigger.entity_id == 'sensor.droger_watts' %}
-              Droger gestart.
+              Droger gestart - Tijdstip: {{now().strftime("%H:%M")}}
             {% endif %}
- #     - service: media_player.volume_set
- #       data_template:
- #         entity_id: media_player.unnamed_room
- #         volume_level: 0.3
- #     - service: tts.google_say
- #       entity_id: media_player.unnamed_room
- #       data_template:
- #         message: >-
- #           {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
- #             Het wasprogramma is gestart.
- #           {% elif trigger.entity_id == 'sensor.droger_watts' %}
- #             De droger is gestart.
- #           {% endif %}
+  #     - service: media_player.volume_set
+  #       data_template:
+  #         entity_id: media_player.unnamed_room
+  #         volume_level: 0.3
+  #     - service: tts.google_say
+  #       entity_id: media_player.unnamed_room
+  #       data_template:
+  #         message: >-
+  #           {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+  #             Het wasprogramma is gestart.
+  #           {% elif trigger.entity_id == 'sensor.droger_watts' %}
+  #             De droger is gestart.
+  #           {% endif %}
 
   - id: "1577787317847"
     alias: Waskamer - Wasmachine/droger - Uit
@@ -257,9 +257,9 @@ automation:
           title: "Waskamer:"
           message: >-
             {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-              Wasprogramma gereed. Doorlooptijd: {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.wasmachine.last_changed))/60) | round | int }} minuten. Verbruik: {{ states('sensor.wasmachine_verbruik') }} kWh.
+              Wasprogramma gereed - Tijdstip: {{now().strftime("%H:%M")}}
             {% elif trigger.entity_id == 'sensor.droger_watts' %}
-              Droger gereed. Doorlooptijd: {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.droger.last_changed))/60) | round | int }} minuten. Verbruik: {{ states('sensor.droger_verbruik') }} kWh.
+              Droger gereed - Tijdstip: {{now().strftime("%H:%M")}}
             {% endif %}
       - service: input_boolean.turn_off
         data_template:
@@ -267,19 +267,19 @@ automation:
             {% if trigger.entity_id == 'sensor.wasmachine_watts' %}input_boolean.wasmachine
             {% elif trigger.entity_id == 'sensor.droger_watts' %}input_boolean.droger
             {% endif %}
-#      - service: media_player.volume_set
-#        data_template:
-#          entity_id: media_player.unnamed_room
-#          volume_level: 0.3
-#      - service: tts.google_say
-#        entity_id: media_player.unnamed_room
-#        data_template:
-#          message: >-
-#            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
-#              Het wasprogramma is gereed. De doorlooptijd is {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.wasmachine.last_changed))/60) | round | int }} minuten.
-#            {% elif trigger.entity_id == 'sensor.droger_watts' %}
-#              De droger is gereed. De doorlooptijd is {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.droger.last_changed))/60) | round | int }} minuten.
-#            {% endif %}
+  #      - service: media_player.volume_set
+  #        data_template:
+  #          entity_id: media_player.unnamed_room
+  #          volume_level: 0.3
+  #      - service: tts.google_say
+  #        entity_id: media_player.unnamed_room
+  #        data_template:
+  #          message: >-
+  #            {% if trigger.entity_id == 'sensor.wasmachine_watts' %}
+  #              Het wasprogramma is gereed. De doorlooptijd is {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.wasmachine.last_changed))/60) | round | int }} minuten.
+  #            {% elif trigger.entity_id == 'sensor.droger_watts' %}
+  #              De droger is gereed. De doorlooptijd is {{ ((as_timestamp(now())-as_timestamp(states.input_boolean.droger.last_changed))/60) | round | int }} minuten.
+  #            {% endif %}
 
   - id: "1577787317848"
     alias: "Sensor update Wasmachine/Droger draaitijd"

@@ -1,0 +1,74 @@
+################################################
+## Packages
+################################################
+homeassistant:
+
+################################################
+## Sensor
+################################################
+binary_sensor:
+  - platform: tod
+    name: daytime
+    after: "06:00:00"
+    before: "18:00:00"
+  - platform: tod
+    name: evening
+    after: "18:00:00"
+    before: "00:00:00"
+  - platform: tod
+    name: nighttime
+    after: "00:00:00"
+    before: "06:00:00"
+
+sensor:
+  - platform: season
+    type: astronomical
+  - platform: moon
+  - platform: uptime
+  - platform: time_date
+
+  - platform: version
+    name: "HASS - Version installed"
+    source: local
+
+  - platform: version
+    name: "HASS - Version available"
+    beta: false
+    image: default
+    source: docker
+
+  - platform: dnsip
+    name: IP adres
+
+  - platform: tautulli
+    api_key: !secret tautulli_token
+    host: !secret tautulli_url
+    port: !secret tautulli_port
+
+################################################
+## Automation
+################################################
+automation:
+  - id: "1600694311899"
+    alias: Home Assistant - Set Theme on Startup
+    trigger:
+      - platform: homeassistant
+        event: start
+    condition: []
+    action:
+      - service: frontend.set_theme
+        data:
+          name: ios-dark-mode-blue-red-alternative
+
+  - id: "1601849976543"
+    alias: Buiten - Volle maan - Verzend notificatie
+    trigger:
+      - platform: state
+        entity_id: sensor.moon
+        to: full_moon
+    condition: []
+    action:
+      - service: notify.mobile_app_skynet_bram
+        data:
+          title: Full moon!
+          message: Full moon!

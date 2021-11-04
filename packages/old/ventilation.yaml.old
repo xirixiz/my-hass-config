@@ -85,11 +85,13 @@ sensor:
 ################################################
 script:
   ventilation_turn_on_off_dummy:
-    mode: single
+
+
     sequence:
       - delay: 1
   ventilation_set_preset_mode:
-    mode: single
+
+
     fields:
       host:
         description: Hostname or ip
@@ -105,7 +107,8 @@ script:
         data:
           entity_id: sensor.mechanische_ventilatie_status
   ventilation_set_speed_timer:
-    mode: single
+
+
     fields:
       host:
         description: Hostname or ip
@@ -124,7 +127,8 @@ script:
         data:
           entity_id: sensor.mechanische_ventilatie_status
   ventilation_set_voltage:
-    mode: single
+
+
     fields:
       host:
         description: Hostname or ip
@@ -150,9 +154,62 @@ automation:
     action:
       - service: homeassistant.turn_off
         entity_id: switch.mechanische_ventilatie
-      - delay: "00:00:10"
+      - delay: "00:01:30"
       - service: homeassistant.turn_on
         entity_id: switch.mechanische_ventilatie
+
+
+  - id: '1612883551714'
+    alias: Badkamer - Motion - Ventilatie - Aan
+    description: ''
+    trigger:
+    - type: motion
+      platform: device
+      device_id: 1dd23b20c53c1c11f3e0635bbe6c21a2
+      entity_id: binary_sensor.hue_outdoor_motion_sensor_1_motion
+      domain: binary_sensor
+    condition: []
+    action:
+    - type: turn_off
+      device_id: a01ef0e097ce68abf5244f43bf54a21f
+      entity_id: switch.cv_ketel
+      domain: switch
+    - delay:
+        hours: 0
+        minutes: 0
+        seconds: 10
+        milliseconds: 0
+    - type: turn_on
+      device_id: a01ef0e097ce68abf5244f43bf54a21f
+      entity_id: switch.cv_ketel
+      domain: switch
+    - service: script.ventilation_set_preset_mode
+      data:
+        speed: max
+
+
+  - id: '1612883633643'
+    alias: Badkamer - Motion - Ventilatie - Uit
+    description: ''
+    trigger:
+    - type: no_motion
+      platform: device
+      device_id: 1dd23b20c53c1c11f3e0635bbe6c21a2
+      entity_id: binary_sensor.hue_outdoor_motion_sensor_1_motion
+      domain: binary_sensor
+      for:
+        hours: 0
+        minutes: 15
+        seconds: 0
+        milliseconds: 0
+    condition: []
+    action:
+    - service: script.ventilation_set_preset_mode
+      data:
+        speed: low
+
+
+
 # LOVELACE
 # type: entities
 # show_header_toggle: false

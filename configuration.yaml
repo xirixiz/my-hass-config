@@ -30,7 +30,6 @@ tts:
     # time_memory: 300
 
 updater:
-  include_used_components: true
 
 proximity:
 
@@ -43,7 +42,7 @@ logger:
 lovelace:
 
 #influxdb:
-#  host: 192.168.1.15
+#  host: 192.168.10.10
 #  max_retries: 3
 #  default_measurement: state
 #  include:
@@ -61,19 +60,20 @@ lovelace:
 #      - sensor.living_room_thermostat_target
 #      - weather.home
 
-group: !include groups.yaml
-automation: !include automations.yaml
-script: !include scripts.yaml
-scene: !include scenes.yaml
-sensor: !include sensors.yaml
-binary_sensor: !include binary_sensors.yaml
-input_number: !include input_numbers.yaml
-input_boolean: !include input_booleans.yaml
+# group: !include groups.yaml
+# automation: !include automations.yaml
+# script: !include scripts.yaml
+# scene: !include scenes.yaml
+# sensor: !include sensors.yaml
+# binary_sensor: !include binary_sensors.yaml
+# input_number: !include input_numbers.yaml
+# input_boolean: !include input_booleans.yaml
 #frontend: !include frontend.yaml
 frontend:
   themes: !include_dir_merge_named themes
 
-#mobile_app:
+mobile_app:
+discovery:
 
 ios:
   push:
@@ -107,12 +107,12 @@ notify:
   - platform: group
     name: family
     services:
-      - service: mobile_app_skynet_mobile
+      - service: mobile_app_skynet_bram
       - service: mobile_app_lieke_iphone
   - platform: group
     name: bram
     services:
-      - service: mobile_app_skynet_mobile
+      - service: mobile_app_skynet_bram
 
 timer:
   hal_overlopen:
@@ -132,7 +132,6 @@ nest:
   client_secret: !secret nest_client_secret
   project_id: !secret nest_client_project_id
   subscriber_id: !secret nest_client_subscriber_id
-
 webostv:
   - host: !secret lgwebostv_host_1
     name: Livingroom TV

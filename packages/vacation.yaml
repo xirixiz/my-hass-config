@@ -1,0 +1,75 @@
+################################################
+## Packages
+################################################
+homeassistant:
+
+################################################
+## Inputs
+################################################
+input_boolean:
+  vakantie:
+    name: Vakantie
+    initial: off
+    icon: mdi:beach
+
+################################################
+## Automation
+################################################
+automation:
+  - id: "1577872674983"
+    alias: Vakantie - Apparatuur - Aan
+    trigger:
+      - entity_id: input_boolean.vakantie
+        from: "on"
+        platform: state
+        to: "off"
+    action:
+      - entity_id: light.woonkamer_tv
+        service: light.turn_on
+      - entity_id: switch.wasmachine
+        service: switch.turn_on
+      - entity_id: switch.droger
+        service: switch.turn_on
+
+  - id: "1577872674982"
+    alias: Vakantie - Apparatuur - Uit
+    trigger:
+      - entity_id: input_boolean.vakantie
+        from: "off"
+        platform: state
+        to: "on"
+    action:
+      - entity_id: light.woonkamer_tv
+        service: light.turn_off
+      - entity_id: light.slaapkamer_tv
+        service: light.turn_off
+      - entity_id: switch.wasmachine
+        service: switch.turn_off
+      - entity_id: switch.droger
+        service: switch.turn_off
+
+  - id: "1635879140349"
+    alias: Vakantie - Thermostaat - aan
+    trigger:
+      - platform: state
+        entity_id: input_boolean.vakantie
+        from: "on"
+        to: "off"
+    condition: []
+    action:
+      - service: climate.turn_on
+        target:
+          entity_id: climate.woonkamer
+
+  - id: "1635879140350"
+    alias: Vakantie - Thermostaat - Uit
+    trigger:
+      - platform: state
+        entity_id: input_boolean.vakantie
+        from: "off"
+        to: "on"
+    condition: []
+    action:
+      - service: climate.turn_off
+        target:
+          entity_id: climate.woonkamer

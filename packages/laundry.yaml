@@ -64,26 +64,6 @@ sensor:
   # WASMACHINE
   - platform: template
     sensors:
-      # wasmachine_amps:
-      #   friendly_name_template: "{{ states.switch.wasmachine.name}} Current"
-      #   value_template: '{{ states.switch.wasmachine.attributes["current_a"] | float }}'
-      #   unit_of_measurement: "A"
-      # wasmachine_watts:
-      #   friendly_name_template: "{{ states.switch.wasmachine.name}} Current Consumption"
-      #   value_template: '{{ states.switch.wasmachine.attributes["current_power_w"] | float }}'
-      #   unit_of_measurement: "W"
-      # wasmachine_total_kwh:
-      #   friendly_name_template: "{{ states.switch.wasmachine.name}} Total Consumption"
-      #   value_template: '{{ states.switch.wasmachine.attributes["total_energy_kwh"] | float }}'
-      #   unit_of_measurement: "kWh"
-      # wasmachine_volts:
-      #   friendly_name_template: "{{ states.switch.wasmachine.name}} Voltage"
-      #   value_template: '{{ states.switch.wasmachine.attributes["voltage"] | float }}'
-      #   unit_of_measurement: "V"
-      # wasmachine_today_kwh:
-      #   friendly_name_template: "{{ states.switch.wasmachine.name}} Today's Consumption"
-      #   value_template: '{{ states.switch.wasmachine.attributes["today_energy_kwh"] | float }}'
-      #   unit_of_measurement: "kWh"
       wasmachine_verbruik:
         friendly_name: "Wasmachine verbruik"
         value_template: '{{ (float(states("input_number.wasmachine_stop")) - float(states("input_number.wasmachine_start"))) | round(3) }}'
@@ -107,26 +87,6 @@ sensor:
   # DROGER
   - platform: template
     sensors:
-      # droger_amps:
-      #   friendly_name_template: "{{ states.switch.droger.name}} Current"
-      #   value_template: '{{ states.switch.droger.attributes["current_a"] | float }}'
-      #   unit_of_measurement: "A"
-      # droger_watts:
-      #   friendly_name_template: "{{ states.switch.droger.name}} Current Consumption"
-      #   value_template: '{{ states.switch.droger.attributes["current_power_w"] | float }}'
-      #   unit_of_measurement: "W"
-      # droger_total_kwh:
-      #   friendly_name_template: "{{ states.switch.droger.name}} Total Consumption"
-      #   value_template: '{{ states.switch.droger.attributes["total_energy_kwh"] | float }}'
-      #   unit_of_measurement: "kWh"
-      # droger_volts:
-      #   friendly_name_template: "{{ states.switch.droger.name}} Voltage"
-      #   value_template: '{{ states.switch.droger.attributes["voltage"] | float }}'
-      #   unit_of_measurement: "V"
-      # droger_today_kwh:
-      #   friendly_name_template: "{{ states.switch.droger.name}} Today's Consumption"
-      #   value_template: '{{ states.switch.droger.attributes["today_energy_kwh"] | float }}'
-      #   unit_of_measurement: "kWh"
       droger_verbruik:
         friendly_name: "Droger verbruik"
         value_template: '{{ (float(states("input_number.droger_stop")) - float(states("input_number.droger_start"))) | round(3) }}'

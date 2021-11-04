@@ -2,9 +2,6 @@
 ## Packages
 ################################################
 homeassistant:
-# customize:
-#   switch.xxx:
-#     friendly_name: xxx
 
 ################################################
 ## Inputs

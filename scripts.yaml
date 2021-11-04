@@ -1,8 +1,0 @@
-'1601963659615':
-  alias: Test Script
-  sequence:
-  - service: notify.family
-    data:
-      title: De kinderen zijn beneden!
-      message: Stelletje boeven!
-  mode: single

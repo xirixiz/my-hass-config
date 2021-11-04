@@ -1,0 +1,343 @@
+################################################
+## Packages
+################################################
+homeassistant:
+
+################################################
+## Sensor
+################################################
+sensor:
+  - platform: template
+    sensors:
+      woonkamer_light_level_lux:
+        friendly_name: "Woonkamer Light Level - LUX"
+        value_template: "{{ states.sensor.woonkamer_light_level.attributes.lightlevel }}"
+        unit_of_measurement: lux
+      hal_light_level_lux:
+        friendly_name: "Hal Light Level - LUX"
+        value_template: "{{ states.sensor.hal_light_level.attributes.lightlevel }}"
+        unit_of_measurement: lux
+
+################################################
+## Automation
+################################################
+automation:
+  - id: "1581204986110"
+    alias: Buiten - Verlichting - Aan
+    trigger:
+      - type: illuminance
+        platform: device
+        device_id: 3564efe7aedf4465a41cf9f88d14c156
+        entity_id: sensor.buiten_sensor_light_level
+        domain: sensor
+        below: 10
+        for:
+          hours: 0
+          minutes: 0
+          seconds: 30
+        above: 2
+    condition:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: light.buiten
+            state: "off"
+      - condition: time
+        after: "16:00:00"
+        before: "00:00:00"
+    action:
+      - data:
+          group_name: Buiten
+          scene_name: Bright
+        service: hue.hue_activate_scene
+
+  - id: "1581205043194"
+    alias: Buiten - Verlichting - Uit
+    trigger:
+      - at: "00:00:00"
+        platform: time
+    condition:
+      - condition: state
+        entity_id: light.buiten
+        state: "on"
+    action:
+      - entity_id: light.buiten
+        service: light.turn_off
+
+  - id: "1577787879546"
+    alias: Verlichting - Vakantie - Aan
+    trigger:
+      - at: "20:00:00"
+        platform: time
+    condition:
+      - condition: state
+        entity_id: input_boolean.vakantie
+        state: "on"
+    action:
+      - data:
+          group_name: Beneden
+          scene_name: BenedenDimmed
+        service: hue.hue_activate_scene
+      - data:
+          group_name: Woonkamer
+          scene_name: WoonkamerDimmed
+        service: hue.hue_activate_scene
+      - data:
+          group_name: Keuken
+          scene_name: KeukenDimmed
+        service: hue.hue_activate_scene
+
+  - id: "1577787879547"
+    alias: Verlichting - Vakantie - Uit
+    trigger:
+      - at: "00:00:00"
+        platform: time
+    condition:
+      - condition: state
+        entity_id: input_boolean.vakantie
+        state: "on"
+    action:
+      - entity_id: light.beneden
+        service: light.turn_off
+      - entity_id: light.keuken
+        service: light.turn_off
+      - entity_id: light.woonkamer
+        service: light.turn_off
+
+  - id: "1577787182078"
+    alias: Woonkamer - Verlichting - Lux - Aan
+    trigger:
+      - above: 3
+        below: 12
+        device_id: 3301c784485e43ca92a8576aae1d14c6
+        domain: sensor
+        entity_id: sensor.woonkamer_light_level
+        for:
+          hours: 0
+          minutes: 1
+          seconds: 0
+        platform: device
+        type: illuminance
+    condition:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: light.woonkamer
+            state: "off"
+          - condition: state
+            entity_id: light.keuken
+            state: "off"
+          - condition: state
+            entity_id: input_boolean.vakantie
+            state: "off"
+    action:
+      - data:
+          group_name: Beneden
+          scene_name: BenedenDimmed
+        service: hue.hue_activate_scene
+      - data:
+          group_name: Woonkamer
+          scene_name: WoonkamerDimmed
+        service: hue.hue_activate_scene
+      - data:
+          group_name: Keuken
+          scene_name: KeukenDimmed
+        service: hue.hue_activate_scene
+
+  - id: "1577787317842"
+    alias: Woonkamer - Verlichting - Lux - Uit
+    trigger:
+      - above: 15
+        device_id: 3301c784485e43ca92a8576aae1d14c6
+        domain: sensor
+        entity_id: sensor.woonkamer_light_level
+        for:
+          hours: 0
+          minutes: 1
+          seconds: 0
+        platform: device
+        type: illuminance
+    condition:
+      - condition: and
+        conditions:
+          - condition: state
+            entity_id: light.woonkamer
+            state: "on"
+          - condition: state
+            entity_id: light.keuken
+            state: "on"
+          - condition: state
+            entity_id: input_boolean.vakantie
+            state: "off"
+    action:
+      - entity_id: light.beneden
+        service: light.turn_off
+      - entity_id: light.keuken
+        service: light.turn_off
+      - entity_id: light.woonkamer
+        service: light.turn_off
+
+  - id: "1577872785614"
+    alias: Verlichting - Motion - Time - Uit
+    trigger:
+      - device_id: 3301c784485e43ca92a8576aae1d14c6
+        domain: binary_sensor
+        entity_id: binary_sensor.woonkamer_motion
+        for:
+          hours: 0
+          minutes: 30
+          seconds: 0
+        platform: device
+        type: no_motion
+    condition:
+      - condition: and
+        conditions:
+          - condition: time
+            after: "21:00:00"
+          - condition: state
+            entity_id: light.woonkamer
+            state: "on"
+          - condition: state
+            entity_id: media_player.livingroom_tv
+            state: "off"
+    action:
+      - entity_id: light.beneden
+        service: light.turn_off
+      - entity_id: light.woonkamer
+        service: light.turn_off
+      - entity_id: light.keuken
+        service: light.turn_off
+      - entity_id: light.buiten
+        service: light.turn_off
+
+  - id: "1577796092710"
+    alias: Hal - Verlichting - Motion - Dag
+    trigger:
+      - device_id: 90706093c60c4af29471cd60bbdd2b41
+        domain: binary_sensor
+        entity_id: binary_sensor.hal_motion
+        platform: device
+        type: motion
+    condition:
+      - condition: and
+        conditions:
+          - after: "08:00:00"
+            before: "20:00:00"
+            condition: time
+          - condition: state
+            entity_id: input_boolean.vakantie
+            state: "off"
+    action:
+      - data:
+          group_name: Hal & Overlopen
+          scene_name: Dimmed
+        service: hue.hue_activate_scene
+
+  - id: "1577796092709"
+    alias: Hal - Verlichting - Motion - Nacht
+    trigger:
+      - device_id: 90706093c60c4af29471cd60bbdd2b41
+        domain: binary_sensor
+        entity_id: binary_sensor.hal_motion
+        platform: device
+        type: motion
+    condition:
+      - condition: and
+        conditions:
+          - after: "20:00:00"
+            before: "00:00:00"
+            condition: time
+          - condition: state
+            entity_id: input_boolean.vakantie
+            state: "off"
+    action:
+      - data:
+          group_name: Hal & Overlopen
+          scene_name: Nightlight
+        service: hue.hue_activate_scene
+
+  - id: "1577871936187"
+    alias: Slaapkamer Lex en Boris - Verlichting - Aan
+    trigger:
+      - at: "18:00:00"
+        platform: time
+    condition:
+      - condition: state
+        entity_id: input_boolean.vakantie
+        state: "off"
+    action:
+      - entity_id: light.slaapkamer_lex_disabled
+        service: light.turn_on
+      - entity_id: light.slaapkamer_boris
+        service: light.turn_on
+
+  - id: "1577872674979"
+    alias: Slaapkamer Lex en Boris - Verlichting - Uit
+    trigger:
+      - at: "09:00:00"
+        platform: time
+    condition:
+      - condition: state
+        entity_id: input_boolean.vakantie
+        state: "off"
+    action:
+      - entity_id: light.slaapkamer_lex
+        service: light.turn_off
+      - entity_id: light.slaapkamer_boris
+        service: light.turn_off
+
+  - id: "1577872674980"
+    alias: Verlichting - Verzend notificatie
+    trigger:
+      - platform: state
+        entity_id: media_player.livingroom_tv
+        to: "off"
+        for: "0:01:00"
+    condition:
+      - condition: and
+        conditions:
+          - condition: time
+            after: "21:00:00"
+          - condition: state
+            entity_id: light.woonkamer
+            state: "on"
+    action:
+      - service: notify.family
+        data:
+          message: De verlichting staat nog aan!
+          data:
+            push:
+              badge: 0
+              category: lampen
+
+  - id: "1577872674981"
+    alias: Verlichting - Notificatie actie
+    trigger:
+      - platform: event
+        event_type: ios.notification_action_fired
+        event_data:
+          actionName: LAMPEN_UIT
+    action:
+      - entity_id: light.woonkamer
+        service: light.turn_off
+      - entity_id: light.keuken
+        service: light.turn_off
+      - entity_id: light.buiten
+        service: light.turn_off
+
+  - id: "1578407345450"
+    alias: Hal - Verlichting - Motion - Uit
+    trigger:
+      - device_id: 90706093c60c4af29471cd60bbdd2b41
+        domain: binary_sensor
+        entity_id: binary_sensor.hal_motion
+        for:
+          hours: 0
+          minutes: 5
+          seconds: 0
+        platform: device
+        type: no_motion
+    condition: []
+    action:
+      - entity_id: light.hal_overlopen
+        service: light.turn_off

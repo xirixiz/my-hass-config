@@ -1,0 +1,24 @@
+################################################
+## Packages
+################################################
+homeassistant:
+
+################################################
+## Inputs
+################################################
+input_boolean:
+  oppas:
+    name: Oppas status
+    initial: off
+    icon: mdi:account-child
+
+################################################
+## Sensors
+################################################
+binary_sensor:
+  - platform: template
+    sensors:
+      oppas:
+        friendly_name: Oppas
+        value_template: '{{ states.input_boolean.oppas.state == "on" }}'
+        device_class: presence

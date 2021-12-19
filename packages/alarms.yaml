@@ -34,10 +34,6 @@ automation:
         domain: light
         entity_id: light.buiten_garage
         type: turn_on
-      - type: turn_on
-        device_id: 98244d710640498d8a48419a483ff435
-        entity_id: switch.apple_tv
-        domain: switch
       - delay: 00:7:30
       - device_id: 4610da9448cc49f497dd9eaa8f0f2e45
         domain: light
@@ -47,10 +43,6 @@ automation:
         domain: light
         entity_id: light.buiten_garage
         type: turn_off
-      - type: turn_off
-        device_id: 98244d710640498d8a48419a483ff435
-        entity_id: switch.apple_tv
-        domain: switch
 
   - id: "1597609986589"
     alias: Kinderen - Wakker - Verzend notificatie
@@ -73,22 +65,15 @@ automation:
           title: "Woonkamer:"
           message: 'Er is beweging - Tijdstip: {{now().strftime("%H:%M")}}'
         service: notify.family
-      - service: hue.hue_activate_scene
-        data:
-          scene_name: BenedenDimmed
-          group_name: Beneden
-      - service: hue.hue_activate_scene
-        data:
-          group_name: Woonkamer
-          scene_name: WoonkamerDimmed
-      - service: hue.hue_activate_scene
-        data:
-          group_name: Keuken
-          scene_name: KeukenDimmed
-      - service: hue.hue_activate_scene
-        data:
-          group_name: Hal & Overlopen
-          scene_name: Dimmed
+      - service: scene.turn_on
+        target:
+          entity_id: scene.woonkamer_woonkamerdimmed
+      - service: scene.turn_on
+        target:
+          entity_id: scene.keuken_keukendimmed
+      - service: scene.turn_on
+        target:
+          entity_id: scene.hal_overlopen_dimmed
 
   - id: "1601844634937"
     alias: BMW - Update every 5 minutes
@@ -111,7 +96,7 @@ automation:
         after: "00:00:00"
         before: "05:30:00"
     action:
-      - service: notify.mobile_app_skynet_bram
+      - service: notify.bram
         data:
           message: De auto is open!
           title: BMW geopend!
@@ -119,19 +104,27 @@ automation:
         data:
           entity_id: media_player.other_speaker
           message: De auto is open!
-      - service: hue.hue_activate_scene
-        data:
-          group_name: Buiten
-          scene_name: Bright
-      - service: hue.hue_activate_scene
-        data:
-          group_name: Beneden
-          scene_name: Bright
+      - service: scene.turn_on
+        target:
+          entity_id: scene.buiten_bright
+      - service: scene.turn_on
+        target:
+          entity_id: scene.woonkamer_bright
+      - service: scene.turn_on
+        target:
+          entity_id: scene.keuken_bright
+      - service: scene.turn_on
+        target:
+          entity_id: scene.hal_overlopen_bright
       - delay: 00:10:00
-      - service: light.turn_off
-        entity_id: light.beneden
-      - service: light.turn_off
-        entity_id: light.buiten
+      - entity_id: light.woonkamer
+        service: light.turn_off
+      - entity_id: light.keuken
+        service: light.turn_off
+      - entity_id: light.buiten
+        service: light.turn_off
+      - entity_id: light.hal_overlopen
+        service: light.turn_of
 
   - id: "1600928113047"
     alias: Buiten - Temperatuur - Vorst
@@ -145,9 +138,7 @@ automation:
         after: "07:00:00"
         before: "07:15:00"
       - condition: template
-        value_template:
-          "{{ (as_timestamp(now()) - as_timestamp(states.automation.buiten_temperatuur_vorst.attributes.last_triggered
-          | default(0)) | int > 10800)}}"
+        value_template: "{{ (as_timestamp(now()) - as_timestamp(states.automation.buiten_temperatuur_vorst.attributes.last_triggered| default(0)) | int > 10800)}}"
     action:
       - service: notify.family
         data:

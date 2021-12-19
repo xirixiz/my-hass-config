@@ -38,6 +38,12 @@ input_boolean:
   waste_reminder:
     name: Waste reminder enabled
     initial: "on"
+    icon: mdi:delete-empty
+  trash_outside:
+    name: Trash outside reminder
+    initial: "off"
+    icon: mdi:delete-empty
+
 
 ################################################
 ## Sensor
@@ -111,10 +117,10 @@ automation:
 
   - alias: Afval - Bevestig notificatie
     trigger:
-      platform: event
-      event_type: ios.notification_action_fired
-      event_data:
-        actionName: MARK_WASTE_MOVED
+      - platform: event
+        event_type: mobile_app_notification_action
+        event_data:
+          action: "MARK_WASTE_MOVED"
     action:
       - service: input_boolean.turn_on
         entity_id: input_boolean.waste_moved
@@ -140,9 +146,53 @@ automation:
     action:
       - service: notify.family
         data:
-          title: "Afval"
+          title: 'Afval'
           message: 'Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. Afvaltype(n): {{ states.sensor.afvalwijzer_tomorrow_formatted.state }} wordt opgehaald op: {{ (as_timestamp(now()) + (24*3600)) | timestamp_custom("%d-%m-%Y", True) }}!'
+          data:
+            actions:
+              - action: "MARK_WASTE_MOVED"
+                title: "Afval verwerkt"
+                activationMode: "background"
+                authenticationRequired: no
+                destructive: yes
+                behavior: "default"
+      # TEST
+      - service: notify.family
+        data:
+          title: iOS notification
+          message: >
+            {{states('sensor.afvalwijzer_today')|title}} wordt vandaag opgehaald, zet het afval aan de straat
+          data:
+            actions:
+              - action: MARK_TRASH_MOVED
+                title: Afval verwerkt
+                authenticationRequired: false
+                activationMode: background
+                destructive: true
+            push:
+              badge: 5
+            action_data:
+              entity_id: input_boolean.trash_outside
+  # TEST
+  - alias: Mark trash as moved outside from notification
+    id: Mark trash as moved outside from notification
+    trigger:
+      platform: event
+      event_type: mobile_app_notification_action
+      event_data:
+        action: MARK_TRASH_MOVED
+    action:
+      - service: input_boolean.turn_on
+        entity_id: input_boolean.trash_outside
+      - service: persistent_notification.dismiss
+        data:
+          notification_id: >
+            trash-notification-{{'today' if is_state('persistent_notification.trash_notification_today','notifying')
+                                 else 'tomorrow'}}
+      - service: notify.family
+        data:
+          title: iOS notification
+          message: Afval staat aan de straat
           data:
             push:
               badge: 0
-              category: "afval"

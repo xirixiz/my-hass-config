@@ -75,33 +75,33 @@ frontend:
 mobile_app:
 discovery:
 
-ios:
-  push:
-    categories:
-      - name: Afval
-        identifier: "afval"
-        actions:
-          - identifier: "MARK_WASTE_MOVED"
-            title: "Afval verwerkt"
-            activationMode: "background"
-            authenticationRequired: no
-            destructive: yes
-            behavior: "default"
-      - name: Lampen
-        identifier: "lampen"
-        actions:
-          - identifier: "LAMPEN_UIT"
-            title: "Lampen uit"
-            activationMode: "background"
-            authenticationRequired: no
-            destructive: yes
-            behavior: "default"
-          - identifier: "DISMISS"
-            title: "Dismiss"
-            activationMode: "background"
-            authenticationRequired: no
-            destructive: no
-            behavior: "default"
+# ios:
+#   push:
+#     categories:
+#       # - name: Afval
+#       #   identifier: "afval"
+#       #   actions:
+#       #     - identifier: "MARK_WASTE_MOVED"
+#       #       title: "Afval verwerkt"
+#       #       activationMode: "background"
+#       #       authenticationRequired: no
+#       #       destructive: yes
+#       #       behavior: "default"
+#       - name: Lampen
+#         identifier: "lampen"
+#         actions:
+#           - identifier: "LAMPEN_UIT"
+#             title: "Lampen uit"
+#             activationMode: "background"
+#             authenticationRequired: no
+#             destructive: yes
+#             behavior: "default"
+#           - identifier: "DISMISS"
+#             title: "Dismiss"
+#             activationMode: "background"
+#             authenticationRequired: no
+#             destructive: no
+#             behavior: "default"
 
 notify:
   - platform: group
@@ -118,12 +118,12 @@ timer:
   hal_overlopen:
     duration: "00:5:00"
 
-# bmw_connected_drive:
-#   bmw_640i_xdrive:
-#     username: !secret bmw_username
-#     password: !secret bmw_password
-#     region: rest_of_world
-#     read_only: true
+bmw_connected_drive:
+  bmw_640i_xdrive:
+    username: !secret bmw_username
+    password: !secret bmw_password
+    region: rest_of_world
+    read_only: true
 
 climate:
 

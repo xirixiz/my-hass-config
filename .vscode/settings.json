@@ -1,3 +1,8 @@
 {
-    "python.pythonPath": "C:\\Users\\brdartel\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
+    "python.pythonPath": "C:\\Users\\brdartel\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "[yaml]": {
+        "editor.defaultFormatter": "redhat.ansible"
+    }
 }

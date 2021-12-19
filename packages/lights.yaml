@@ -11,11 +11,11 @@ sensor:
     sensors:
       woonkamer_light_level_lux:
         friendly_name: "Woonkamer Light Level - LUX"
-        value_template: "{{ states.sensor.woonkamer_light_level.attributes.lightlevel }}"
+        value_template: "{{ states.sensor.woonkamer_light_level.attributes.light_level }}"
         unit_of_measurement: lux
       hal_light_level_lux:
         friendly_name: "Hal Light Level - LUX"
-        value_template: "{{ states.sensor.hal_light_level.attributes.lightlevel }}"
+        value_template: "{{ states.sensor.hal_light_level.attributes.light_level }}"
         unit_of_measurement: lux
 
 ################################################
@@ -46,10 +46,9 @@ automation:
         after: "16:00:00"
         before: "00:00:00"
     action:
-      - data:
-          group_name: Buiten
-          scene_name: Bright
-        service: hue.hue_activate_scene
+      - service: scene.turn_on
+        target:
+          entity_id: scene.buiten_bright
 
   - id: "1581205043194"
     alias: Buiten - Verlichting - Uit
@@ -74,18 +73,12 @@ automation:
         entity_id: input_boolean.vakantie
         state: "on"
     action:
-      - data:
-          group_name: Beneden
-          scene_name: BenedenDimmed
-        service: hue.hue_activate_scene
-      - data:
-          group_name: Woonkamer
-          scene_name: WoonkamerDimmed
-        service: hue.hue_activate_scene
-      - data:
-          group_name: Keuken
-          scene_name: KeukenDimmed
-        service: hue.hue_activate_scene
+      - service: scene.turn_on
+        target:
+          entity_id: scene.woonkamer_woonkamerdimmed
+      - service: scene.turn_on
+        target:
+          entity_id: scene.keuken_keukendimmed
 
   - id: "1577787879547"
     alias: Verlichting - Vakantie - Uit
@@ -97,8 +90,6 @@ automation:
         entity_id: input_boolean.vakantie
         state: "on"
     action:
-      - entity_id: light.beneden
-        service: light.turn_off
       - entity_id: light.keuken
         service: light.turn_off
       - entity_id: light.woonkamer
@@ -131,18 +122,12 @@ automation:
             entity_id: input_boolean.vakantie
             state: "off"
     action:
-      - data:
-          group_name: Beneden
-          scene_name: BenedenDimmed
-        service: hue.hue_activate_scene
-      - data:
-          group_name: Woonkamer
-          scene_name: WoonkamerDimmed
-        service: hue.hue_activate_scene
-      - data:
-          group_name: Keuken
-          scene_name: KeukenDimmed
-        service: hue.hue_activate_scene
+      - service: scene.turn_on
+        target:
+          entity_id: scene.woonkamer_woonkamerdimmed
+      - service: scene.turn_on
+        target:
+          entity_id: scene.keuken_keukendimmed
 
   - id: "1577787317842"
     alias: Woonkamer - Verlichting - Lux - Uit
@@ -170,8 +155,6 @@ automation:
             entity_id: input_boolean.vakantie
             state: "off"
     action:
-      - entity_id: light.beneden
-        service: light.turn_off
       - entity_id: light.keuken
         service: light.turn_off
       - entity_id: light.woonkamer
@@ -198,11 +181,9 @@ automation:
             entity_id: light.woonkamer
             state: "on"
           - condition: state
-            entity_id: media_player.livingroom_tv
+            entity_id: media_player.sony_bravia_tv
             state: "off"
     action:
-      - entity_id: light.beneden
-        service: light.turn_off
       - entity_id: light.woonkamer
         service: light.turn_off
       - entity_id: light.keuken
@@ -228,10 +209,9 @@ automation:
             entity_id: input_boolean.vakantie
             state: "off"
     action:
-      - data:
-          group_name: Hal & Overlopen
-          scene_name: Dimmed
-        service: hue.hue_activate_scene
+      - service: scene.turn_on
+        target:
+          entity_id: scene.hal_overlopen_dimmed
 
   - id: "1577796092709"
     alias: Hal - Verlichting - Motion - Nacht
@@ -251,10 +231,9 @@ automation:
             entity_id: input_boolean.vakantie
             state: "off"
     action:
-      - data:
-          group_name: Hal & Overlopen
-          scene_name: Nightlight
-        service: hue.hue_activate_scene
+      - service: scene.turn_on
+        target:
+          entity_id: scene.hal_overlopen_nightlight
 
   - id: "1577871936187"
     alias: Slaapkamer Lex en Boris - Verlichting - Aan
@@ -290,7 +269,7 @@ automation:
     alias: Verlichting - Verzend notificatie
     trigger:
       - platform: state
-        entity_id: media_player.livingroom_tv
+        entity_id: media_player.sony_bravia_tv
         to: "off"
         for: "0:01:00"
     condition:
@@ -304,19 +283,30 @@ automation:
     action:
       - service: notify.family
         data:
+          title: Verlichting
           message: De verlichting staat nog aan!
           data:
-            push:
-              badge: 0
-              category: lampen
+            actions:
+              - action: "LAMPEN_UIT"
+                title: "Lampen uit"
+                activationMode: "background"
+                authenticationRequired: no
+                destructive: yes
+                behavior: "default"
+              - action: "DISMISS"
+                title: "Dismiss"
+                activationMode: "background"
+                authenticationRequired: no
+                destructive: no
+                behavior: "default"
 
   - id: "1577872674981"
     alias: Verlichting - Notificatie actie
     trigger:
       - platform: event
-        event_type: ios.notification_action_fired
+        event_type: mobile_app_notification_action
         event_data:
-          actionName: LAMPEN_UIT
+          action: "LAMPEN_UIT"
     action:
       - entity_id: light.woonkamer
         service: light.turn_off

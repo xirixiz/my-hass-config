@@ -1,0 +1,159 @@
+################################################
+## Packages / Power Plugs
+################################################
+homeassistant:
+  customize:
+    switch.ventilatie:
+      friendly_name: Ventilatie
+
+################################################
+## REST
+################################################
+rest_command:
+  ventilation_preset_mode:
+    url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ preset_mode }}
+    username: !secret nrf905_username
+    password: !secret nrf905_password
+  ventilation_set_speed_timer:
+    url: http://{{ host }}/api/v2/fan/setspeed.json?speed={{ speed }}&timer={{ timer }}
+    username: !secret nrf905_username
+    password: !secret nrf905_password
+  ventilation_set_voltage:
+    url: http://{{ host }}/api/v2/fan/setvoltage.json?voltage={{ voltage }}
+    username: !secret nrf905_username
+    password: !secret nrf905_password
+
+################################################
+## FAN
+################################################
+fan:
+  - platform: template
+    fans:
+      ventilatie:
+        friendly_name: Mechanische ventilatie
+        value_template: >
+          {{ states('sensor.ventilatie_status') }}
+        availability_template: >
+          {{ states('sensor.ventilatie_status') }}
+        percentage_template: >
+          {{ state_attr('sensor.ventilatie_status', 'percentage') }}
+        preset_mode_template: >
+          {{ state_attr('sensor.ventilatie_status', 'speed') }}
+        turn_on:
+          service: script.ventilation_turn_on_off_dummy
+        turn_off:
+          service: script.ventilation_turn_on_off_dummy
+        set_percentage:
+          service: script.ventilation_set_voltage
+          data:
+            voltage: "{{ percentage / 10 }}"
+        set_preset_mode:
+          service: script.ventilation_set_preset_mode
+          data:
+            preset_mode: "{{ preset_mode }}"
+        preset_modes:
+          - low
+          - medium
+          - high
+          - max
+
+################################################
+## Sensor
+################################################
+sensor:
+  - platform: rest
+    name: Ventilatie
+    resource: !secret nrf905_status_url
+    username: !secret nrf905_username
+    password: !secret nrf905_password
+    value_template: >
+      {% if value_json['result'] == 'ok' %}
+        on
+      {% else %}
+        off
+      {% endif %}
+    json_attributes_path: $.devices.82 # This will be different for each fan.
+    # json_attributes_path: "$.devices.*" # This might be different for each fan.
+    json_attributes:
+      - voltage
+      - percentage
+      - speed
+      - timer
+
+################################################
+## Script
+################################################
+script:
+  ventilation_turn_on_off_dummy:
+    sequence:
+      - delay: 1
+  ventilation_set_preset_mode:
+    fields:
+      host:
+        description: Hostname or ip
+      preset_mode:
+        description: Set the fan preset mode (low/medium/high/max)
+    sequence:
+      - service: rest_command.ventilation_preset_mode
+        data:
+          host: !secret nrf905_host
+          preset_mode: "{{ preset_mode }}"
+      - delay: 1
+      - service: homeassistant.update_entity
+        data:
+          entity_id: sensor.ventilatie_status
+  ventilation_set_speed_timer:
+    fields:
+      host:
+        description: Hostname or ip
+      speed:
+        description: Set the fan speed (low/medium/high/max)
+      timer:
+        description: Set the fan timer (number of minutes)
+    sequence:
+      - service: rest_command.ventilation_set_speed_timer
+        data:
+          host: !secret nrf905_host
+          speed: "{{ speed }}"
+          timer: "{{ timer }}"
+      - delay: 1
+      - service: homeassistant.update_entity
+        data:
+          entity_id: sensor.ventilatie_status
+  ventilation_set_voltage:
+    fields:
+      host:
+        description: Hostname or ip
+      voltage:
+        description: Set the fan voltage, between 0.0 and 10.0
+    sequence:
+      - service: rest_command.ventilation_set_voltage
+        data:
+          host: !secret nrf905_host
+          voltage: "{{ voltage }}"
+      - delay: 1
+      - service: homeassistant.update_entity
+        data:
+          entity_id: sensor.ventilatie_status
+
+################################################
+## Automation
+################################################
+automation:
+  - id: nrf905_unavailable_reboot
+    alias: Ventilation - Reboot nrf905 if unavailable
+    initial_state: on
+    mode: restart
+    trigger:
+      - platform: state
+        entity_id: fan.ventilatie
+        to: unavailable
+        for:
+          minutes: 1
+    action:
+      - service: switch.turn_off
+        entity_id: switch.ventilatie
+      - delay:
+          minutes: 1
+      - service: switch.turn_on
+        entity_id: switch.ventilatie

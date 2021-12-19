@@ -68,7 +68,7 @@ automation:
         to: full_moon
     condition: []
     action:
-      - service: notify.mobile_app_skynet_bram
+      - service: notify.bram
         data:
           title: Full moon!
           message: Full moon!

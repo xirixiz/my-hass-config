@@ -42,6 +42,12 @@ automation:
       - platform: state
         entity_id: binary_sensor.badkamer_motion
         to: "on"
+    condition:
+      - condition: and
+        conditions:
+          - condition: time
+            after: "06:30:00"
+            before: "19:00:00"
     action:
       service: fan.set_percentage
       data:
@@ -57,6 +63,12 @@ automation:
         entity_id: binary_sensor.badkamer_motion
         to: "off"
         for: "0:15:00"
+    condition:
+      - condition: and
+        conditions:
+          - condition: time
+            after: "06:30:00"
+            before: "19:00:00"
     action:
       service: fan.set_percentage
       data:

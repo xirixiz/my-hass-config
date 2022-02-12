@@ -164,13 +164,12 @@ automation:
       - entity_id: light.hal_overlopen
         service: light.turn_of
 
-  - id: "1600928113047"
+  - id: "1600928113847"
     alias: Buiten - Temperatuur - Vorst
     trigger:
       - platform: numeric_state
         entity_id: sensor.buiten_sensor_temperature
-        below: "0"
-        for: "00:10:00"
+        below: 0
     condition:
       - condition: time
         after: "06:00:00"
@@ -182,5 +181,4 @@ automation:
         data:
           title: Het vriest vandaag!
           message: >
-            Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. De buitentemperatuur
-            is {{ states.sensor.buiten_sensor_temperature.state }} graden!
+            Het is vandaag - {{ now().strftime("%d-%m-%Y") }}. De buitentemperatuur is {{ states.sensor.buiten_sensor_temperature.state }} graden!

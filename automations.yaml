@@ -1,40 +1,30 @@
-# - id: '1635879140349'
-#   alias: New Automation
-#   description: ''
-#   trigger:
-#   - platform: state
-#     entity_id: input_boolean.vakantie
-#     from: 'off'
-#     to: 'on'
-#   condition: []
-#   action:
-#   - service: climate.turn_off
-#     target:
-#       entity_id: climate.woonkamer
-#   mode: single
-# - id: '1636497769220'
-#   alias: test
-#   description: ''
-#   trigger:
-#   - type: no_motion
-#     platform: device
-#     device_id: 3301c784485e43ca92a8576aae1d14c6
-#     entity_id: binary_sensor.woonkamer_motion
-#     domain: binary_sensor
-#     for:
-#       hours: 0
-#       minutes: 30
-#       seconds: 0
-#       milliseconds: 0
-#   condition:
-#   - condition: state
-#     entity_id: media_player.sony_bravia_tv
-#     state: 'off'
-#   - condition: state
-#     entity_id: light.woonkamer
-#     state: 'on'
-#   action:
-#   - service: light.turn_off
-#     target:
-#       entity_id: light.beneden
-#   mode: single
+- id: '1644654884689'
+  alias: Badkamer - Motion
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.badkamer_motion
+    to: 'on'
+  condition: []
+  action:
+  - service: fan.set_speed
+    data:
+      speed: high
+    target:
+      entity_id: fan.buva_fan
+  mode: single
+- id: '1644655000205'
+  alias: Badkamer
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: binary_sensor.badkamer_motion
+    to: 'on'
+  condition: []
+  action:
+  - service: fan.set_speed
+    data:
+      speed: high
+    target:
+      entity_id: fan.buva_fan
+  mode: single

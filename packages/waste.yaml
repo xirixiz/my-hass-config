@@ -1,5 +1,5 @@
 ################################################
-## Packages / Waste
+## Packages
 ################################################
 homeassistant:
   customize:
@@ -170,22 +170,22 @@ automation:
               entity_id: input_boolean.trash_outside
 
       # TEST ACTION
-      - service: notify.bram
-        data:
-          title: iOS notification
-          message: >
-            {{states('sensor.afvalwijzer_today')|title}} wordt vandaag opgehaald, zet het afval aan de straat
-          data:
-            actions:
-              - action: MARK_TRASH_MOVED
-                title: Afval verwerkt
-                authenticationRequired: false
-                activationMode: background
-                destructive: true
-            push:
-              badge: 5
-            action_data:
-              entity_id: input_boolean.trash_outside
+      #- service: notify.bram
+      #  data:
+      #    title: iOS notification
+      #    message: >
+      #      {{states('sensor.afvalwijzer_today')|title}} wordt vandaag opgehaald, zet het afval aan de straat
+      #    data:
+      #      actions:
+      #        - action: MARK_TRASH_MOVED
+      #          title: Afval verwerkt
+      #          authenticationRequired: false
+      #          activationMode: background
+      #          destructive: true
+      #      push:
+      #        badge: 5
+      #      action_data:
+      #        entity_id: input_boolean.trash_outside
 
   # # TEST
   # - alias: Mark trash as moved outside from notification

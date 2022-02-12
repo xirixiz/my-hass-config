@@ -318,7 +318,7 @@ automation:
       - entity_id: light.buiten
         service: light.turn_off
 
-  - id: "1578407345450"
+  - id: "1578407345452"
     alias: Hal - Verlichting - Motion - Uit
     trigger:
       - device_id: 90706093c60c4af29471cd60bbdd2b41

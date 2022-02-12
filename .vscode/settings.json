@@ -3,6 +3,6 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "[yaml]": {
-        "editor.defaultFormatter": "redhat.ansible"
+        "editor.defaultFormatter": "redhat.vscode-yaml"
     }
 }

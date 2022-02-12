@@ -1,0 +1,91 @@
+################################################
+## Packages
+################################################
+homeassistant:
+  customize:
+    switch.ventilatie:
+      friendly_name: Ventilatie
+
+################################################
+## Fan
+################################################
+fan:
+  - platform: template
+    fans:
+      ventilatie:
+        friendly_name: Mechanische ventilatie
+        percentage_template: >
+          {{ state_attr('fan.buva_fan', 'percentage') }}
+        preset_mode_template: >
+          {{ state_attr('fan.buva_fan', 'speed') }}
+        turn_on:
+          service: fan.set_percentage
+          data:
+            percentage: 100
+          target:
+            device_id: afe8c29e3ac222798b3e0852b79c1fa6
+        turn_off:
+          service: fan.set_percentage
+          data:
+            percentage: 25
+          target:
+            device_id: afe8c29e3ac222798b3e0852b79c1fa6
+
+################################################
+## Automation
+################################################
+automation:
+  - id: buva_ventilation_on
+    alias: Ventilation - Bathroom - On
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.badkamer_motion
+        to: "on"
+    action:
+      service: fan.set_percentage
+      data:
+        percentage: 100
+      target:
+        device_id: afe8c29e3ac222798b3e0852b79c1fa6
+
+  - id: buva_ventilation_off
+    alias: Ventilation - Bathroom - Off
+    initial_state: on
+    trigger:
+      - platform: state
+        entity_id: binary_sensor.badkamer_motion
+        to: "off"
+        for: "0:15:00"
+    action:
+      service: fan.set_percentage
+      data:
+        percentage: 25
+      target:
+        device_id: afe8c29e3ac222798b3e0852b79c1fa6
+
+  - id: buva_ventilation_night
+    alias: Ventilation - Bathroom - Night
+    initial_state: on
+    trigger:
+      - at: "19:00:00"
+        platform: time
+    action:
+      service: fan.set_percentage
+      data:
+        percentage: 100
+      target:
+        device_id: afe8c29e3ac222798b3e0852b79c1fa6
+
+  - id: buva_ventilation_night
+    alias: Ventilation - Bathroom - Night
+    initial_state: on
+    trigger:
+      - at: "06:30:00"
+        platform: time
+    action:
+      service: fan.set_percentage
+      data:
+        percentage: 25
+      target:
+        device_id: afe8c29e3ac222798b3e0852b79c1fa6
